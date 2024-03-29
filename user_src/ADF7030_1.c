@@ -687,7 +687,7 @@ void SCAN_RECEIVE_PACKET(void)
         WaitForADF7030_FIXED_DATA(); //等待芯片空闲/可接受CMD状�??
         ADF7030_RECEIVING_FROM_POWEROFF();
         RAM_RSSI_AVG = RAM_RSSI_SUM / RSSI_Read_Counter;
-        RSSI_Read_Counter = 0;
+        //RSSI_Read_Counter = 0;
         RAM_RSSI_SUM = 0;
         TIMER18ms = 28;
         Flag_FREQ_Scan = 0;
@@ -727,9 +727,9 @@ void WaitForADF7030_FIXED_DATA(void)
     {
         DELAY_30U();
         ADF7030_FIXED_DATA();
-        ClearWDT();
-        count++;
-    } while ((((ADF7030_Read_OneByte & 0x20) != 0x20) || ((ADF7030_Read_OneByte & 0x06) != 0x04)) && (count < 5000));
+        //ClearWDT();
+        //count++;
+    } while ((((ADF7030_Read_OneByte & 0x20) != 0x20) || ((ADF7030_Read_OneByte & 0x06) != 0x04)) && (count < 200));
 }
 /**
 ****************************************************************************
@@ -1336,8 +1336,8 @@ void Select_TX_frequency(void)
 	  {
 	       if(TX_Scan_step==1)
            {
-               TX_Scan_step=2;
-//               Select_TX_frequency();
+               TX_Scan_step=2;//Select_TX_frequency();
+               Time_APP_RXstart = 1000;
            }
 		   if(TX_Scan_step==2)
 		   {
@@ -1365,6 +1365,14 @@ void Select_TX_frequency(void)
                     Receiver_LED_TX = 0;
                     FLAG_APP_TX_once=0;
 				}
+                else if(Time_APP_RXstart == 0)
+                {
+                   FLAG_APP_RXstart=1;
+				   FLAG_APP_TX=0;
+				   Time_APP_RXstart=1;
+				   Receiver_LED_TX = 0;
+				   FLAG_APP_TX_once=0;
+                }
 		   }
 	  }
 	  if((FLAG_APP_RXstart==1)&&(Time_APP_RXstart==0)&&(FLAG_APP_TX_fromUART_err_read==0))

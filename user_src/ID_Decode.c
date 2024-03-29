@@ -297,13 +297,18 @@ void Signal_DATA_Decode(UINT8 NUM_Type)
         else
             data_in = SPI_Receive_DataForC[i + 3];
         data_out = 0;
-        data_in = data_in >> 1;
         for (j = 0; j < 16; j++)
         {
+            if (((data_in & 0x00000003)==3)||((data_in & 0x00000003)==0))
+            {
+                FLAG_Signal_DATA_OK = 0;
+                return;
+            }
+            data_in = data_in >> 1;
             data_out = data_out << 1;
             if (data_in & 0x00000001)
                 data_out += 1;
-            data_in = data_in >> 2;
+            data_in = data_in >> 1;
         }
         data_NRZ[i] = data_out;
     }
@@ -1156,8 +1161,8 @@ void Freq_Scanning(void)
 			{
 				if (ADF7030_Read_RESIGER(0x4000380C, 1, 0) != 0)
 				{
-		            FG_Receiver_LED_RX = 1;
-
+		             FG_Receiver_LED_RX = 1;
+					RSSI_Read_Counter = 0;
 					Flag_FREQ_Scan = 1;
 					if(Radio_Date_Type==1)
 					  {TIMER18ms = 82;TIMER300ms = 600; }

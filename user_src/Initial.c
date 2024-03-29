@@ -236,7 +236,7 @@ void ADF7030_GPIO_INIT(void)
     ADF7030_GPIO2_CR2 = InterruptDisable; //禁止中断
 
     ADF7030_GPIO3_DDR = Input; //输入
-    ADF7030_GPIO3_CR1 = 1;     //1: Input with pull-up 0: Floating input
+    ADF7030_GPIO3_CR1 = 0;     //1: Input with pull-up 0: Floating input
     ADF7030_GPIO3_CR2 = 0;     //禁止中断
     if(Receiver_test == 0)
         BerExtiInit();

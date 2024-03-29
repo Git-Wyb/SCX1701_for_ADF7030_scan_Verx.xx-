@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"D:\工作软件\IAR for STM8 Install\common\bin\cspybat" -f "D:\MyWork\space\SCX1701_for_ADF7030_scan_Verx.xx2\settings\project.Debug.general.xcl" --backend -f "D:\MyWork\space\SCX1701_for_ADF7030_scan_Verx.xx2\settings\project.Debug.driver.xcl" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "D:\Work\Source Code\bunka-s\SCX1701\SCX1701 for ADF7030 scan Verx.xx(new)\settings\project.Debug.general.xcl" --backend -f "D:\Work\Source Code\bunka-s\SCX1701\SCX1701 for ADF7030 scan Verx.xx(new)\settings\project.Debug.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"D:\工作软件\IAR for STM8 Install\common\bin\cspybat" -f "D:\MyWork\space\SCX1701_for_ADF7030_scan_Verx.xx2\settings\project.Debug.general.xcl" "--debug_file=%~1" --backend -f "D:\MyWork\space\SCX1701_for_ADF7030_scan_Verx.xx2\settings\project.Debug.driver.xcl" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 7.3\common\bin\cspybat" -f "D:\Work\Source Code\bunka-s\SCX1701\SCX1701 for ADF7030 scan Verx.xx(new)\settings\project.Debug.general.xcl" "--debug_file=%~1" --backend -f "D:\Work\Source Code\bunka-s\SCX1701\SCX1701 for ADF7030 scan Verx.xx(new)\settings\project.Debug.driver.xcl" 
 
 @echo off 
 :end
