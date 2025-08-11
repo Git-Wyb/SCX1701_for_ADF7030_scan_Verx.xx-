@@ -189,6 +189,7 @@ u16 Time_error_read_timeout=0;
 u8 ERROR_Read_sendTX_count=0;
 u8 ERROR_Read_sendTX_packet=0;
 u8 Flag_ERROR_Read_once_again=0;
+u8 uart_rx_data = 0;
 
 
 

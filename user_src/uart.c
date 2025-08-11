@@ -43,9 +43,9 @@ void UART1_INIT(void)
 	u1InitCompleteFlag = 0;
 
 	SYSCFG_RMPCR1_USART1TR_REMAP = 0;
-	USART1_CR1_bit.M = 1;
-	USART1_CR1_bit.PCEN = 1;
-	USART1_CR1_bit.PS = 1;
+	USART1_CR1_bit.M = 0;
+	USART1_CR1_bit.PCEN = 0;
+	USART1_CR1_bit.PS = 0;
 	USART1_CR2_bit.TIEN = 0;
 	USART1_CR2_bit.TCIEN = 0;
 	USART1_CR2_bit.RIEN = 1;
@@ -53,21 +53,12 @@ void UART1_INIT(void)
 	USART1_CR2_bit.TEN = 1;
 	USART1_CR2_bit.REN = 1;
 
-	//	USART1_CR3 = 0; // 1个停止位
-	//	USART1_CR4 = 0;
-	//	USART1_CR5 = 0x00;  //0x08;						// 半双工模�?
 	/*设置波特�? */
 	baud_div = 16000000 / 9600; /*求出分频因子*/
 	USART1_BRR2 = baud_div & 0x0f;
 	USART1_BRR2 |= ((baud_div & 0xf000) >> 8);
 	USART1_BRR1 = ((baud_div & 0x0ff0) >> 4); /*先给BRR2赋�??�?后再设置BRR1*/
 
-	//	USART1_BRR2 = 0x03; // 设置波特�?600
-	//	USART1_BRR1 = 0x68; // 3.6864M/9600 = 0x180
-	//16.00M/9600 = 0x683
-	//USART1_CR2 = 0x08;	// 允许发�??
-	//USART1_CR2 = 0x24;
-	//Send_char(0xa5);
 	u1InitCompleteFlag = 1;
 }
 void UART1_end(void)
@@ -87,9 +78,13 @@ void UART1_end(void)
 void UART1_RX_RXNE(void)
 { // RXD中断服务程序
 	unsigned char dat;
-	dat = USART1_DR; // 接收数据
+    if(USART1_SR_bit.RXNE == 1)
+    {
+        uart_rx_data = USART1_DR; // 接收数据
+        flag_rx_done = 1;
+    }
 					 //Send_char(dat);
-	ReceiveFrame(dat);
+	//ReceiveFrame(dat);
 	// if (dat == '(')
 	// 	SIO_cnt = 0;
 	// SIO_buff[SIO_cnt] = dat;
@@ -107,7 +102,8 @@ void UART1_RX_RXNE(void)
 
 //--------------------------------------------
 void Send_char(unsigned char ch)
-{				 // 发�?�字�?
+{
+    flag_rx_done = 0;
 	TXD1_enable; // 允许发�??
 	while (!USART1_SR_TXE)
 		;

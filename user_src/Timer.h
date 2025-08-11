@@ -15,5 +15,7 @@ extern u16 StateReadTimer;
 //============================================ Timer 4
 void TIM4_Init(void);
 void TIM4_UPD_OVF(void);
+void mDelaymS(u16 ms);
+void mDelayuS(u8 us);
 
 #endif

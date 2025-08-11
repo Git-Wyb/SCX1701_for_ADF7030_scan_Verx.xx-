@@ -110,3 +110,28 @@ void TIM4_UPD_OVF(void)
 
     TIM4_SR1_bit.UIF = 0; // 清除中断标记
 }
+
+void mDelaymS(u16 ms)
+{
+    time_sw = ms;
+    while(time_sw)
+    {
+        ClearWDT();
+    }
+}
+
+void Delay_us(unsigned short timer)
+{
+    unsigned short x; //延时T=((timer-1)*0.313+2 us
+    unsigned short timer_cache;
+    timer_cache = timer / 3;
+    for (x = 0; x < timer_cache; x++)
+    {
+        __asm("nop");
+    }
+}
+
+void mDelayuS(u8 us) //10=10us,250=300us
+{
+    Delay_us(4 * us);
+}

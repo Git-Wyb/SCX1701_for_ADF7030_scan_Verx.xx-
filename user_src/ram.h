@@ -217,6 +217,7 @@ extern u16 BASE_TIME_BEEP_off;
 #define FG_beep_off_Motor   flag1_Un.FlagByte_bit1
 #define recv_429code_flag   flag1_Un.FlagByte_bit2  //1：接收到429MHz的闭操作指令
 #define close_action_beep_flag   flag1_Un.FlagByte_bit3  //1：接收到429MHz的闭操作指令后动作中信号输入，开启蜂鸣器
+#define flag_rx_done        flag1_Un.FlagByte_bit4
 
 #define Save_Disable_Beep 0xAA
 
@@ -252,6 +253,7 @@ extern u8 ERROR_Read_sendTX_packet;
 extern u8 Flag_ERROR_Read_once_again;
 
 extern u16 time_sw;
+extern u8 uart_rx_data;
 
 
 #endif

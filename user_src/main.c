@@ -29,6 +29,7 @@
 #include "ID_Decode.h"    // ID_Decode处理
 #include "eeprom.h"       // eeprom
 #include "uart.h"         // uart
+#include "CH376.h"
 /** @addtogroup STM8L15x_StdPeriph_Template
   * @{
   */
@@ -46,19 +47,30 @@
   * @param  None
   * @retval None
   */
-
+u8 ssta = 0;
 void main(void)
 {
     _DI();             // 关全�?中断
     RAM_clean();       // 清除RAM
-    WDT_init();        //看门狿
+    //WDT_init();        //看门狿
     VHF_GPIO_INIT();   //IO初始�?
     SysClock_Init();   //系统时钟初始�?
     InitialFlashReg(); //flash EEPROM
-    eeprom_sys_load(); //ID载入
+    time_sw = 0;
+    UART1_INIT();
+    //eeprom_sys_load(); //ID载入
     TIM4_Init();       // 定时�?
+    _EI();
     //beep_init();       // 蜂鸣�?
     ClearWDT(); // Service the WDT
+
+    ssta = CH376_USB_Del();
+    if(ssta == 0x55) Receiver_LED_OUT = 1;
+    else PIN_BEEP = 1;
+    while(1)
+    {
+       ;
+    }
 
     PROFILE_CH_FREQ_32bit_200002EC = 426075000;
     PROFILE_RADIO_AFC_CFG1_32bit_2000031C = 0x0005005A;

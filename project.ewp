@@ -17,7 +17,7 @@
         <debug>1</debug>
         <option>
           <name>GenDeviceSelectMenu</name>
-          <state>STM8L151C6	STM8L151C6</state>
+          <state>STM8L151G6	STM8L151G6</state>
         </option>
         <option>
           <name>GenCodeModel</name>
@@ -1683,6 +1683,9 @@
     <name>user</name>
     <file>
       <name>$PROJ_DIR$\user_src\ADF7030_1.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\user_src\CH376.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\user_src\eeprom.c</name>

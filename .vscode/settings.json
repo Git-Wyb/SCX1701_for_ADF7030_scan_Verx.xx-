@@ -15,7 +15,9 @@
         "adf7030_1.h": "c",
         "pin_define.h": "c",
         "eeprom.h": "c",
-        "uart.h": "c"
+        "uart.h": "c",
+        "CH376HFT.C": "cpp",
+        "IOSTM8L151G4.H": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false,
 }
