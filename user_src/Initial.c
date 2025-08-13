@@ -29,7 +29,7 @@ void WDT_init(void)
 {
     IWDG_KR = 0xCC;
     IWDG_KR = 0x55;
-    IWDG_PR = 5;
+    IWDG_PR = 5;      //约862ms触发看门狗复位
     IWDG_KR = 0xAA;
 }
 void ClearWDT(void)

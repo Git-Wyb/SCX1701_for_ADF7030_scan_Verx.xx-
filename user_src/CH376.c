@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include "CH376INC.H"
 #include "type_def.h"
 #include "uart.h"
@@ -24,6 +25,14 @@ UINT8 CH376_USB_Del(void)
     if(CH376_HOST_INIT() != USB_INT_SUCCESS) return  ERR_USB_UNKNOWN;
     else
     {
+        if(KEY_SW4)
+            {
+                sta = 0;
+            }
+            else
+            {
+                sta = 1;
+            }
 RE_WRITE:
         sta++;
         if(CH376DiskConnect() != USB_INT_SUCCESS) return  ERR_USB_UNKNOWN;
@@ -38,17 +47,29 @@ RE_WRITE:
             }
             s = CH376DiskQuery( (PUINT32)buf );  /* 查询磁盘剩余空间信息,扇区数 */
             if ( s != USB_INT_SUCCESS ){if(sta > RECNT) return ERR_USB_UNKNOWN;else {goto RE_WRITE;}}
-
+            sta = 0;
             //s = CH376DirCreate( "/Logs" );  /* 新建或者打开目录,该目录建在根目录下 */
             //if ( s == USB_INT_SUCCESS || s == ERR_FOUND_NAME) {}
             //else {return ERR_USB_UNKNOWN;}
+RE_T:
+            mDelaymS( 100 );
+            sta++;
             s = CH376FileCreate( "LOG_2025.TXT" );  /* 在当前目录下新建文件,如果文件已经存在则先删除后再新建 */
             if ( s != USB_INT_SUCCESS ){if(sta > RECNT) return ERR_USB_UNKNOWN;else {goto RE_WRITE;}}
             Receiver_LED_RX = 1;
-            strcpy( buf, "Chis is 演示数据\r\n" );
-            //strcpy( buf, "aa bb cc" );
-            s = CH376ByteWrite( buf, strlen(buf), NULL );  /* 以字节为单位向当前位置写入数据块 */
-            if ( s != USB_INT_SUCCESS ){if(sta > RECNT) return ERR_USB_UNKNOWN;else {goto RE_WRITE;}}
+            //strcpy( buf, "Chis is 演示数据\r\n" );
+
+            s = sprintf( buf, "Chis = %d\r\n",sta);
+            s = CH376ByteWrite( buf, s, NULL );  /* 以字节为单位向当前位置写入数据块 */
+            if ( s != USB_INT_SUCCESS )
+            {
+                CH376FileClose( TRUE );
+                if(sta >= 3)
+                {
+                    return ERR_USB_UNKNOWN;
+                }
+                else {goto RE_T;}
+            }
             /*
             strcpy( buf, "2025/07/09_14:10:21_STX0031_11111111_OPEN_-74dBm\r\n" );
             s = CH376ByteWrite( buf, strlen(buf), NULL );  // 以字节为单位向当前位置写入数据块
@@ -62,7 +83,7 @@ RE_WRITE:
                 mDelaymS( 100 );
             } */
             s = CH376FileClose( TRUE );  /* 关闭文件,自动更新文件长度 */
-            if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+            //if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
         }
         return 0x55;
     }
@@ -81,7 +102,7 @@ UINT8 CH376_HOST_INIT(void)
     //UINT8	res;
     re_cnt = 0;
 REINIT:
-    mDelaymS(100);
+    mDelaymS(200);
     xWriteCH376Cmd(CMD11_CHECK_EXIST);  /* 测试单片机与CH376之间的通讯接口 */
     xWriteCH376Data(0x55);   //返回数据按位取反
     re_cnt++;
@@ -100,7 +121,7 @@ REINIT:
     re_cnt = 0;
 
 REHOST:
-    mDelaymS(100);
+    mDelaymS(200);
     xWriteCH376Cmd( CMD11_SET_USB_MODE );
     xWriteCH376Data( 0x06 );
     re_cnt++;
@@ -132,7 +153,7 @@ UINT8 CH376DiskConnect(void)
         xWriteCH376Cmd( CMD0H_DISK_CONNECT );
         mDelaymS(100);
         if(CH376GetIntStatus() == USB_INT_SUCCESS) return  USB_INT_SUCCESS;
-        if(sta++ > 300) return ERR_USB_UNKNOWN;  //30s超时
+        if(sta++ > 3000) return ERR_USB_UNKNOWN;  //30s超时
     }
 }
 
@@ -200,12 +221,13 @@ UINT8 Wait376Interrupt(void)
     //UINT8 red = 0;
 
     UINT32	i;
-	for ( i = 0; i < 5000000; i ++ )
+	for ( i = 0; i < 5000000; i ++ ) //4s
     {  /* 计数防止超时,默认的超时时间,与单片机主频有关 */
 		if ( Query376Interrupt( ) )
         {
             return( CH376GetIntStatus( ) );  /* 检测到中断 */
         }
+        ClearWDT();
 	}
 	return( ERR_USB_UNKNOWN );  /* 不应该发生的情况 */
     /*
@@ -345,7 +367,7 @@ UINT8	CH376FileClose( UINT8 UpdateSz )  /* 关闭当前已经打开的文件或�
 
 UINT8	CH376ByteWrite( PUINT8 buf, UINT16 ReqCount, PUINT16 RealCount )  /* 以字节为单位向当前位置写入数据块 */
 {
-	UINT8	s;
+	UINT8	s,ci;
 	xWriteCH376Cmd( CMD2H_BYTE_WRITE );
 	xWriteCH376Data( (UINT8)ReqCount );
 	xWriteCH376Data( (UINT8)(ReqCount>>8) );
@@ -359,8 +381,16 @@ UINT8	CH376ByteWrite( PUINT8 buf, UINT16 ReqCount, PUINT16 RealCount )  /* 以�
 			buf += s;
 			if ( RealCount ) *RealCount += s;
 		}
-/*		else if ( s == USB_INT_SUCCESS ) return( s );*/  /* 结束 */
-		else return( s );  /* 错误 */
+		else if ( s == USB_INT_SUCCESS ) return( s );  /* 结束 */
+		else
+        {
+            for(ci=0; ci<3; ci++)
+            {
+                s = CH376GetIntStatus( );
+                if ( s == USB_INT_SUCCESS ) return( s );
+            }
+            return( CH376GetIntStatus( ) );
+        }
 	}
 }
 

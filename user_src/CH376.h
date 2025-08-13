@@ -3,7 +3,7 @@
 
 typedef unsigned long               *PUINT32;
 typedef unsigned char               *PUINT8;
-typedef unsigned short              *PUINT16;
+typedef unsigned int                *PUINT16;
 
 UINT8 CH376_HOST_INIT(void);
 void xWriteCH376Cmd(UINT8 mCmd);

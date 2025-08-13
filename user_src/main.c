@@ -57,6 +57,7 @@ void main(void)
     SysClock_Init();   //系统时钟初始�?
     InitialFlashReg(); //flash EEPROM
     time_sw = 0;
+    PIN_BEEP = 0;
     UART1_INIT();
     //eeprom_sys_load(); //ID载入
     TIM4_Init();       // 定时�?
