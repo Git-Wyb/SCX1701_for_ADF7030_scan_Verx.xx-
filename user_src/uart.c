@@ -104,13 +104,13 @@ void UART1_RX_RXNE(void)
 void Send_char(unsigned char ch)
 {
     flag_rx_done = 0;
-	TXD1_enable; // 允许发�??
+	//TXD1_enable; // 允许发�??
 	while (!USART1_SR_TXE)
 		;
 	USART1_DR = ch; // 发�??
 	while (!USART1_SR_TC)
 		;		 // 等待完成发�??
-	RXD1_enable; // 允许接收及其中断
+	//RXD1_enable; // 允许接收及其中断
 }
 //--------------------------------------------
 void Send_String(unsigned char *string)

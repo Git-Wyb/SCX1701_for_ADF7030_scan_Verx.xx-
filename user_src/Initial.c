@@ -301,9 +301,9 @@ void KEY_GPIO_Init(void)
     // KEY_SW3_CR1 = 1;     //1: Input with pull-up 0: Floating input
     // KEY_SW3_CR2 = 0;     //禁止中断
 
-     KEY_SW4_DDR = Input; //输入
-     KEY_SW4_CR1 = 1;     //1: Input with pull-up 0: Floating input
-     KEY_SW4_CR2 = 0;     //禁止中断
+     //KEY_SW4_DDR = Input; //输入
+     //KEY_SW4_CR1 = 1;     //1: Input with pull-up 0: Floating input
+     //KEY_SW4_CR2 = 0;     //禁止中断
 
     Receiver_Login_direc = Input;          // Input   受信机登录键   低电平有�?
     Receiver_Login_CR1 = Floating;         //1: Input with pull-up 0: Floating input

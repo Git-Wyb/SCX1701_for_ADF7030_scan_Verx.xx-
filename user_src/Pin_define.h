@@ -93,10 +93,10 @@
 //#define KEY_SW3_CR1 PA_CR1_C15
 //#define KEY_SW3_CR2 PA_CR2_C25
 //
-#define KEY_SW4 PA_IDR_IDR2
-#define KEY_SW4_DDR PA_DDR_DDR2
-#define KEY_SW4_CR1 PA_CR1_C12
-#define KEY_SW4_CR2 PA_CR2_C22
+//#define KEY_SW4 PA_IDR_IDR2
+//#define KEY_SW4_DDR PA_DDR_DDR2
+//#define KEY_SW4_CR1 PA_CR1_C12
+//#define KEY_SW4_CR2 PA_CR2_C22
 
 // #define Receiver_Login PC_IDR_IDR6       // Input   受信机登录键   低电平有效
 // #define Receiver_Login_direc PC_DDR_DDR6 // Input   受信机登录键   低电平有效

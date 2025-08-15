@@ -58,7 +58,7 @@ void main(void)
     InitialFlashReg(); //flash EEPROM
     time_sw = 0;
     PIN_BEEP = 0;
-    UART1_INIT();
+
     //eeprom_sys_load(); //ID载入
     TIM4_Init();       // 定时�?
     _EI();

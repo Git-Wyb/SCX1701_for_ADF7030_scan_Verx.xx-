@@ -17,7 +17,8 @@
         "eeprom.h": "c",
         "uart.h": "c",
         "CH376HFT.C": "cpp",
-        "IOSTM8L151G4.H": "cpp"
+        "IOSTM8L151G4.H": "cpp",
+        "CH376INC.H": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false,
 }

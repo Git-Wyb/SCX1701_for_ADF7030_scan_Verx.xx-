@@ -1688,6 +1688,9 @@
       <name>$PROJ_DIR$\user_src\CH376.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\user_src\CH376FileName.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\user_src\eeprom.c</name>
     </file>
     <file>

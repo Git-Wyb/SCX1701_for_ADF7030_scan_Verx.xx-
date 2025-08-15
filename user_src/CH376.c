@@ -1,44 +1,24 @@
-#include <string.h>
-#include <stdio.h>
-#include "CH376INC.H"
-#include "type_def.h"
-#include "uart.h"
 #include "CH376.h"
-#include "ram.h"
-#include "Pin_define.h"
-#include <iostm8l151g4.h>
-#include "Timer.h"
+#include "CH376FileName.h"
 
-#define RECNT 0
-UINT8 buf[64];
-UINT16 total;		/* 记录当前缓冲在FILE_DATA_BUF中的数据长度 */
-UINT32 NewSize;	/* 临时变量 */
-UINT8 FileDataBuf[0x4000];	/* 文件缓冲区,太小则速度慢 */
+UINT8 buf[100];
 UINT16 si = 0;
-UINT16 sx = 0;
-UINT16 slen = 0;
+UINT8 File_Name[] = {"Log_20250710_162210.txt"};
+UINT8 File_Data0[] = {"<Registered Remote Controls>\r\n"};
+UINT8 File_Data1[] = {"<Remote Control ID List>\r\n"};
+UINT8 File_Data2[] = {"<Operation History>\r\n"};
+
+UINT8	CH376FileOpen( PUINT8 name );
+UINT8 s = 0;
 UINT8 CH376_USB_Del(void)
 {
-    UINT8 s = 0;
-    UINT8 sta = 0;
 
     if(CH376_HOST_INIT() != USB_INT_SUCCESS) return  ERR_USB_UNKNOWN;
     else
     {
-        if(KEY_SW4)
-            {
-                sta = 0;
-            }
-            else
-            {
-                sta = 1;
-            }
-RE_WRITE:
-        sta++;
         if(CH376DiskConnect() != USB_INT_SUCCESS) return  ERR_USB_UNKNOWN;
         else
         {
-            //return 0x55;
             mDelaymS( 200 );/* 延时,可选操作,有的USB存储器需要几十毫秒的延时 */
             for ( s = 0; s < 10; s ++ )
             {  /* 最长等待时间,10*50mS */
@@ -46,63 +26,71 @@ RE_WRITE:
                 if ( CH376DiskMount() == USB_INT_SUCCESS ) break;  /* 初始化磁盘并测试磁盘是否就绪 */
             }
             s = CH376DiskQuery( (PUINT32)buf );  /* 查询磁盘剩余空间信息,扇区数 */
-            if ( s != USB_INT_SUCCESS ){if(sta > RECNT) return ERR_USB_UNKNOWN;else {goto RE_WRITE;}}
-            sta = 0;
-            //s = CH376DirCreate( "/Logs" );  /* 新建或者打开目录,该目录建在根目录下 */
-            //if ( s == USB_INT_SUCCESS || s == ERR_FOUND_NAME) {}
-            //else {return ERR_USB_UNKNOWN;}
-RE_T:
-            mDelaymS( 100 );
-            sta++;
-            s = CH376FileCreate( "LOG_2025.TXT" );  /* 在当前目录下新建文件,如果文件已经存在则先删除后再新建 */
-            if ( s != USB_INT_SUCCESS ){if(sta > RECNT) return ERR_USB_UNKNOWN;else {goto RE_WRITE;}}
-            Receiver_LED_RX = 1;
-            //strcpy( buf, "Chis is 演示数据\r\n" );
+            if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
 
-            s = sprintf( buf, "Chis = %d\r\n",sta);
-            s = CH376ByteWrite( buf, s, NULL );  /* 以字节为单位向当前位置写入数据块 */
-            if ( s != USB_INT_SUCCESS )
-            {
-                CH376FileClose( TRUE );
-                if(sta >= 3)
-                {
-                    return ERR_USB_UNKNOWN;
-                }
-                else {goto RE_T;}
-            }
-            /*
-            strcpy( buf, "2025/07/09_14:10:21_STX0031_11111111_OPEN_-74dBm\r\n" );
-            s = CH376ByteWrite( buf, strlen(buf), NULL );  // 以字节为单位向当前位置写入数据块
-            if ( s != USB_INT_SUCCESS ){if(sta > RECNT) return ERR_USB_UNKNOWN;else {goto RE_WRITE;}}
-            for(si=0; si<10; si++)
-            {
-                strcpy( buf, "2025/07/09_14:22:45_STX0031_22222222_CLOSE_-50dBm\r\n" );
-                s = CH376ByteWrite( buf, strlen(buf), NULL );
-                if ( s != USB_INT_SUCCESS ){if(sta > RECNT) return ERR_USB_UNKNOWN;else {goto RE_WRITE;}}
-                ClearWDT();
-                mDelaymS( 100 );
-            } */
-            s = CH376FileClose( TRUE );  /* 关闭文件,自动更新文件长度 */
+            s = CH376DirCreate( "/LOGS" );  /* 新建或者打开目录,该目录建在根目录下 */
+            if ( s == USB_INT_SUCCESS || s == ERR_FOUND_NAME) {}
+            else return ERR_USB_UNKNOWN;
+
+            s = CH376_CreateFile_Name("/LOGS/LOG_2025.TXT",File_Name); //新建文件
+            if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+            Receiver_LED_RX = 1;
+
+            //s = SetFileCreateTime( "LOG_2025.TXT", MAKE_FILE_DATE( 2025, 8, 15 ), MAKE_FILE_TIME( 10, 23, 14 ) );  /* 为指定文件设置创建日期和时间 */
             //if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+            //mDelaymS( 200 );
+            s = CH376FileOpen("LOG_2025.TXT"); //上面已经新建/打开目录，所以此步不需要文件夹路径了。
+            if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+
+            s = strlen(File_Data0);
+            s = CH376ByteWrite( File_Data0, s, NULL);
+            if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+
+            s = CH376ByteWrite( "3\r\n", 3, NULL);
+            if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+
+            s = strlen(File_Data1);
+            s = CH376ByteWrite(File_Data1, s, NULL);
+            if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+
+            s = CH376ByteWrite( "12345678\r\n", 10, NULL);
+            if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+
+            s = strlen(File_Data2);
+            s = CH376ByteWrite(File_Data2, s, NULL);
+            if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+
+            for(si=1; si<=200; si++)
+            {
+                mDelaymS( 10 );
+                s = sprintf( buf, "2025/07/09_14:22:45_STX0031_22222222_CLOSE_-50dBm,sta = %d\r\n",si );
+                s = CH376ByteWrite( buf, s, NULL);
+                ClearWDT();
+                if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+            }
+
+            s = CH376FileClose( TRUE );  /* 关闭文件,自动更新文件长度 */
+            if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
         }
         return 0x55;
     }
 }
+//s = sprintf( buf, "2025/07/09_14:22:45_STX0031_22222222_CLOSE_-50dBm,sta = %d\r\n",sta );
 
 
 void CH376_PORT_INIT(void)
 {
     UART1_INIT();
 }
- UINT8	res;
- UINT8	ass;
- UINT8 re_cnt = 0;
+
+UINT8 res = 0;
+UINT8 re_cnt = 0;
 UINT8 CH376_HOST_INIT(void)
 {
-    //UINT8	res;
+    CH376_PORT_INIT();
     re_cnt = 0;
 REINIT:
-    mDelaymS(200);
+    mDelaymS(100);
     xWriteCH376Cmd(CMD11_CHECK_EXIST);  /* 测试单片机与CH376之间的通讯接口 */
     xWriteCH376Data(0x55);   //返回数据按位取反
     re_cnt++;
@@ -121,14 +109,14 @@ REINIT:
     re_cnt = 0;
 
 REHOST:
-    mDelaymS(200);
+    mDelaymS(100);
     xWriteCH376Cmd( CMD11_SET_USB_MODE );
     xWriteCH376Data( 0x06 );
     re_cnt++;
     ClearWDT();
     mDelayuS(20);
-    ass = xReadCH376Data();
-	if ( ass == CMD_RET_SUCCESS )
+    res = xReadCH376Data();
+	if ( res == CMD_RET_SUCCESS )
     {
         re_cnt = 0;
         return( USB_INT_SUCCESS );
@@ -153,7 +141,7 @@ UINT8 CH376DiskConnect(void)
         xWriteCH376Cmd( CMD0H_DISK_CONNECT );
         mDelaymS(100);
         if(CH376GetIntStatus() == USB_INT_SUCCESS) return  USB_INT_SUCCESS;
-        if(sta++ > 3000) return ERR_USB_UNKNOWN;  //30s超时
+        if(sta++ > 6000) return ERR_USB_UNKNOWN;  //等待10分钟超时
     }
 }
 
@@ -163,7 +151,6 @@ void xWriteCH376Cmd(UINT8 mCmd)  /* 向CH376写命令 */
     Send_char(SER_SYNC_CODE1);
     Send_char(SER_SYNC_CODE2);
     Send_char(mCmd);
-    mDelayuS(5);
 }
 
 void xWriteCH376Data(UINT8 mData)  /* 向CH376写数据 */
@@ -174,7 +161,7 @@ void xWriteCH376Data(UINT8 mData)  /* 向CH376写数据 */
 UINT8 xReadCH376Data(void)  /* 从CH376读数据 */
 {
     UINT32	i;
-	for ( i = 0; i < 500000; i ++ )
+	for ( i = 0; i < 500000; i ++ ) //约4s
     {  /* 计数防止超时 */
         if(flag_rx_done)
         {
@@ -204,7 +191,7 @@ UINT8 CH376SendCmdWaitInt(UINT8 mCmd)  /* 发出命令码后,等待中断 */
         xWriteCH376Cmd( mCmd );
         mDelaymS(10);
         if(CH376GetIntStatus() == USB_INT_SUCCESS) return  USB_INT_SUCCESS;
-        if(sta++ > 5) return ERR_USB_UNKNOWN;  //250ms超时
+        if(sta++ > 3) return CH376GetIntStatus();
     }
 }
 
@@ -217,28 +204,28 @@ UINT8	CH376SendCmdDatWaitInt( UINT8 mCmd, UINT8 mDat )  /* 发出命令码和一
 
 UINT8 Wait376Interrupt(void)
 {
-    //UINT8 cnt = 0;
-    //UINT8 red = 0;
-
+    UINT8 cnt = 0;
+    UINT8 red = 0;
+    /*
     UINT32	i;
 	for ( i = 0; i < 5000000; i ++ ) //4s
-    {  /* 计数防止超时,默认的超时时间,与单片机主频有关 */
+    {
 		if ( Query376Interrupt( ) )
         {
-            return( CH376GetIntStatus( ) );  /* 检测到中断 */
+            return( CH376GetIntStatus( ) );
         }
         ClearWDT();
 	}
-	return( ERR_USB_UNKNOWN );  /* 不应该发生的情况 */
-    /*
+	return( ERR_USB_UNKNOWN );
+    */
     while(1)
     {
         ClearWDT();
-        red = CH376GetIntStatus();
-        //if(red != 0) return red;
-        if(cnt++ > 3) return CH376GetIntStatus();  //30ms
         mDelaymS(10);
-    }*/
+        red = CH376GetIntStatus();
+        if(red != 0) return red;
+        if(cnt++ > 3) return CH376GetIntStatus();  //30ms
+    }
 }
 
 UINT8 CH376DiskMount(void)  /* 初始化磁盘并测试磁盘是否就绪 */
@@ -365,6 +352,26 @@ UINT8	CH376FileClose( UINT8 UpdateSz )  /* 关闭当前已经打开的文件或�
 	return( CH376SendCmdDatWaitInt( CMD1H_FILE_CLOSE, UpdateSz ) );
 }
 
+UINT8 CH376_Byte_Write(PUINT8 buf, UINT16 ReqCount)
+{
+    UINT8 s;
+    xWriteCH376Cmd( CMD2H_BYTE_WRITE );
+	xWriteCH376Data( (UINT8)ReqCount );
+	xWriteCH376Data( (UINT8)(ReqCount>>8) );
+    while(1)
+    {
+        s = Wait376Interrupt( );
+        if ( s == USB_INT_DISK_WRITE )
+        {
+            s = CH376WriteReqBlock( buf );
+            xWriteCH376Cmd( CMD0H_BYTE_WR_GO );
+            buf += s;
+        }
+        else return s;
+    }
+}
+
+
 UINT8	CH376ByteWrite( PUINT8 buf, UINT16 ReqCount, PUINT16 RealCount )  /* 以字节为单位向当前位置写入数据块 */
 {
 	UINT8	s,ci;
@@ -394,6 +401,41 @@ UINT8	CH376ByteWrite( PUINT8 buf, UINT16 ReqCount, PUINT16 RealCount )  /* 以�
 	}
 }
 
+UINT8	CH376ReadBlock( PUINT8 buf )  /* 从当前主机端点的接收缓冲区读取数据块,返回长度 */
+{
+	UINT8	s, l;
+	xWriteCH376Cmd( CMD01_RD_USB_DATA0 );
+	s = l = xReadCH376Data( );  /* 长度 */
+	if ( l ) {
+		do {
+			*buf = xReadCH376Data( );
+			buf ++;
+		} while ( -- l );
+	}
+	return( s );
+}
+
+UINT8	CH376ByteRead( PUINT8 buf, UINT16 ReqCount, PUINT16 RealCount )  /* 以字节为单位从当前位置读取数据块 */
+{
+	UINT8	s;
+	xWriteCH376Cmd( CMD2H_BYTE_READ );
+	xWriteCH376Data( (UINT8)ReqCount );
+	xWriteCH376Data( (UINT8)(ReqCount>>8) );
+
+	if ( RealCount ) *RealCount = 0;
+	while ( 1 ) {
+		s = Wait376Interrupt( );
+		if ( s == USB_INT_DISK_READ ) {
+			s = CH376ReadBlock( buf );  /* 从当前主机端点的接收缓冲区读取数据块,返回长度 */
+			xWriteCH376Cmd( CMD0H_BYTE_RD_GO );
+			buf += s;
+			if ( RealCount ) *RealCount += s;
+		}
+/*		else if ( s == USB_INT_SUCCESS ) return( s );*/  /* 结束 */
+		else return( s );  /* 错误 */
+	}
+}
+
 UINT8	CH376WriteReqBlock( PUINT8 buf )  /* 向内部指定缓冲区写入请求的数据块,返回长度 */
 {
 	UINT8	s, l;
@@ -407,9 +449,9 @@ UINT8	CH376WriteReqBlock( PUINT8 buf )  /* 向内部指定缓冲区写入请求�
 	}
 	return( s );
 }
-
+/*
 UINT8 Query376Interrupt( void )
 {
-	return( KEY_SW4 ? FALSE : TRUE );  /* 如果连接了CH376的中断引脚则直接查询中断引脚 */
-}
+	return( KEY_SW4 ? FALSE : TRUE );  // 如果连接了CH376的中断引脚则直接查询中断引脚
+}*/
 

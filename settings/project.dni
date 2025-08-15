@@ -1,6 +1,6 @@
 [DebugChecksum]
 <<<<<<< HEAD
-Checksum=-625321812
+Checksum=-575836543
 =======
 Checksum=773928336
 >>>>>>> f03119bb9d9418453f7da9e2e3549a267f3e0d0b
@@ -105,11 +105,13 @@ Fmt14={W}42:ass	4	0
 Fmt15={W}42:cache	4	0
 Fmt16={W}42:dat	4	0
 Fmt17={W}42:ints	3	0
-Fmt18={W}42:res	4	0
-Fmt19={W}42:s	3	0
-Fmt20={W}42:ssta	4	0
-Fmt21={W}42:time_receive_auto	3	0
-Fmt22={W}42:uart_rx_data	4	0
+Fmt18={W}42:l	3	0
+Fmt19={W}42:res	4	0
+Fmt20={W}42:s	4	0
+Fmt21={W}42:scct	4	0
+Fmt22={W}42:ssta	4	0
+Fmt23={W}42:time_receive_auto	3	0
+Fmt24={W}42:uart_rx_data	4	0
 [DataSample]
 LogEnabled=0
 GraphEnabled=0

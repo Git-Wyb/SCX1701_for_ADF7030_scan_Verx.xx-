@@ -1,6 +1,17 @@
 #ifndef __CH376_H__
 #define __CH376_H__
 
+#include <string.h>
+#include <stdio.h>
+#include "CH376INC.H"
+#include "type_def.h"
+#include "uart.h"
+#include "CH376.h"
+#include "ram.h"
+#include "Pin_define.h"
+#include <iostm8l151g4.h>
+#include "Timer.h"
+
 typedef unsigned long               *PUINT32;
 typedef unsigned char               *PUINT8;
 typedef unsigned int                *PUINT16;
@@ -24,5 +35,13 @@ UINT8 CH376WriteReqBlock( PUINT8 buf );
 UINT8 CH376ByteWrite( PUINT8 buf, UINT16 ReqCount, PUINT16 RealCount );
 UINT8 CH376_USB_Del(void);
 UINT8 Query376Interrupt( void );
+UINT8 CH376_Byte_Write(PUINT8 buf, UINT16 ReqCount);
+void CH376WriteVar32( UINT8 var, UINT32 dat );
+UINT8 CH376ByteRead( PUINT8 buf, UINT16 ReqCount, PUINT16 RealCount );
+UINT8 CH376ReadBlock( PUINT8 buf );
+void CH376WriteVar8( UINT8 var, UINT8 dat );
+UINT8 CH376ReadVar8( UINT8 var );
+UINT32	CH376ReadVar32( UINT8 var );
+UINT8	CH376SendCmdDatWaitInt( UINT8 mCmd, UINT8 mDat );
 
 #endif
