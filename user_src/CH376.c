@@ -7,12 +7,15 @@ UINT8 File_Name[] = {"Log_20250710_162210.txt"};
 UINT8 File_Data0[] = {"<Registered Remote Controls>\r\n"};
 UINT8 File_Data1[] = {"<Remote Control ID List>\r\n"};
 UINT8 File_Data2[] = {"<Operation History>\r\n"};
+UINT8 TYPE[] = {"STX0031"};
+UINT8 CTRL[] = {"CLOSE"};
 
 UINT8	CH376FileOpen( PUINT8 name );
 UINT8 s = 0;
+
 UINT8 CH376_USB_Del(void)
 {
-
+    STRUCT_DATE HIS_DATA;
     if(CH376_HOST_INIT() != USB_INT_SUCCESS) return  ERR_USB_UNKNOWN;
     else
     {
@@ -59,11 +62,21 @@ UINT8 CH376_USB_Del(void)
             s = strlen(File_Data2);
             s = CH376ByteWrite(File_Data2, s, NULL);
             if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
-
+            HIS_DATA.YY = 25;
+            HIS_DATA.MM = 8;
+            HIS_DATA.DD = 15;
+            HIS_DATA.HH = 14;
+            HIS_DATA.MI = 25;
+            HIS_DATA.SS = 30;
+            //TYPE = "STX0031";
+            HIS_DATA.IDD.IDL = 13475495;
+            //CTRL = "OPEN";
+            HIS_DATA.RS = 80;
             for(si=1; si<=200; si++)
             {
                 mDelaymS( 10 );
-                s = sprintf( buf, "2025/07/09_14:22:45_STX0031_22222222_CLOSE_-50dBm,sta = %d\r\n",si );
+                s = sprintf( buf, "20%d/%0d/%0d_%0d:%0d:%0d_%s_%ld_%s_-%ddBm\r\n",HIS_DATA.YY,HIS_DATA.MM,HIS_DATA.DD,
+                            HIS_DATA.HH,HIS_DATA.MI,HIS_DATA.SS,TYPE,HIS_DATA.IDD.IDL,CTRL,HIS_DATA.RS);
                 s = CH376ByteWrite( buf, s, NULL);
                 ClearWDT();
                 if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;

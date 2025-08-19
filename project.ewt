@@ -2045,6 +2045,9 @@
       <name>$PROJ_DIR$\user_src\ID_Decode.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\user_src\IIC.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\user_src\Initial.c</name>
     </file>
     <file>

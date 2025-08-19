@@ -229,7 +229,17 @@ void ADF7030_RECEIVING_FROM_POWEROFF(void);
 void SCAN_RECEIVE_PACKET(void);
 u32 ConfigurationLen(void);
 
-
+typedef struct
+{
+    UINT8 YY;
+    UINT8 MM;
+    UINT8 DD;
+    UINT8 HH;
+    UINT8 MI;
+    UINT8 SS;
+    uni_rom_id IDD;
+    UINT8 RS;
+}STRUCT_DATE;
 
 extern Wireless_Body Struct_DATA_Packet_Contro,Struct_DATA_Packet_Contro_buf;
 extern Wireless_Body Uart_Struct_DATA_Packet_Contro,Last_Uart_Struct_DATA_Packet_Contro;
@@ -254,6 +264,9 @@ extern u8 Flag_ERROR_Read_once_again;
 
 extern u16 time_sw;
 extern u8 uart_rx_data;
-
+extern u8 FLAG_RTC_RTC;
+extern unsigned char g8563_Store[7];
+extern u8 FLAG_CLOCK;
+extern STRUCT_DATE NOW_DATE;
 
 #endif

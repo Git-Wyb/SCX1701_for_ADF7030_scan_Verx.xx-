@@ -4,7 +4,7 @@
 #include <stdbool.h> /* For true/false definition                      */
 //#include "initial.h"		// ?????  ?????
 #include "type_def.h"
-
+#include "ram.h"
 
 
 u8 DEF_APP_TX_freq=4;
@@ -190,10 +190,10 @@ u8 ERROR_Read_sendTX_count=0;
 u8 ERROR_Read_sendTX_packet=0;
 u8 Flag_ERROR_Read_once_again=0;
 u8 uart_rx_data = 0;
-
-
-
-
+u8 FLAG_RTC_RTC = 0;
+unsigned char g8563_Store[7]={0x00,0x59,0x07,0x01,0x01,0x01,0x14}; /*时间交换区,全局变量声明*/
+u8 FLAG_CLOCK = 0;
+STRUCT_DATE NOW_DATE = {0};
 
 
 

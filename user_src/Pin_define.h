@@ -229,6 +229,15 @@
 #define Action_Signal_CR1       PE_CR1_C12
 #define Action_Signal_CR2       PE_CR2_C22
 #define Action_Signal           PE_IDR_IDR2     //动作中信号，为0表示动作信号
+
+#define PIN_PCF8563_SDAOUT      PC_ODR_ODR0
+#define PIN_PCF8563_SDAIN       PC_IDR_IDR0
+#define PIN_PCF8563_SCL         PC_ODR_ODR1
+
+#define PIN_PCF8563_SDA_direc   PC_DDR_DDR0
+#define PIN_PCF8563_SCL_direc   PC_DDR_DDR1
+#define PIN_PCF8563_SDA_CR1     PC_CR1_C10
+#define PIN_PCF8563_SCL_CR1     PC_CR1_C11
 /*
 //测试调试用
 #define Action_Signal_DDR       PC_DDR_DDR1

@@ -1,6 +1,6 @@
 [DebugChecksum]
 <<<<<<< HEAD
-Checksum=-575836543
+Checksum=1988213460
 =======
 Checksum=773928336
 >>>>>>> f03119bb9d9418453f7da9e2e3549a267f3e0d0b
@@ -79,13 +79,20 @@ ShowSource=1
 Freq=16000000
 [struct_types]
 Fmt0=ADF70XX_REG_T-whole_reg	1	0
-Fmt1=uFLAG-BYTE	4	0
+Fmt1=STRUCT_DATE-DD	3	0
+Fmt2=STRUCT_DATE-HH	3	0
+Fmt3=STRUCT_DATE-MI	3	0
+Fmt4=STRUCT_DATE-MM	3	0
+Fmt5=STRUCT_DATE-SS	3	0
+Fmt6=STRUCT_DATE-YY	3	0
+Fmt7=uFLAG-BYTE	4	0
 [array_types]
 Fmt0=u32_t[6]	4	0
 Fmt1=u32_t[7]	4	0
 Fmt2=unsigned char[3]	4	0
 Fmt3=unsigned char[4]	4	0
-Fmt4=unsigned char[9]	4	0
+Fmt4=unsigned char[7]	3	0
+Fmt5=unsigned char[9]	4	0
 [watch_formats]
 Fmt0={W}0:COUNT_Receiver_Login	3	0
 Fmt1={W}0:RAM_rssi_AVG	3	0
@@ -116,8 +123,6 @@ Fmt24={W}42:uart_rx_data	4	0
 LogEnabled=0
 GraphEnabled=0
 ShowTimeLog=1
-[Breakpoints]
-Count=0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -125,6 +130,8 @@ Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
+[Breakpoints]
+Count=0
 [Aliases]
 A0=_ "" ""
 A1=_ "D:\MyCloud\Working\Windowshade\Windowshade7030\user_src\ADF7030_1.c" "F:\Source Code\bunka-s\Bunka STM8L151G6 RX_ADF7030 Source CRX1831DC\Windowshade7030\user_src\ADF7030_1.c"

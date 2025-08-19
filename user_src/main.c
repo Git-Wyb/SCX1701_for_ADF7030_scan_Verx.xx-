@@ -30,6 +30,7 @@
 #include "eeprom.h"       // eeprom
 #include "uart.h"         // uart
 #include "CH376.h"
+#include "IIC.h"
 /** @addtogroup STM8L15x_StdPeriph_Template
   * @{
   */
@@ -48,12 +49,13 @@
   * @retval None
   */
 u8 ssta = 0;
+
 void main(void)
 {
     _DI();             // 关全�?中断
     RAM_clean();       // 清除RAM
     //WDT_init();        //看门狿
-    VHF_GPIO_INIT();   //IO初始�?
+    //VHF_GPIO_INIT();   //IO初始�?
     SysClock_Init();   //系统时钟初始�?
     InitialFlashReg(); //flash EEPROM
     time_sw = 0;
@@ -64,10 +66,16 @@ void main(void)
     _EI();
     //beep_init();       // 蜂鸣�?
     ClearWDT(); // Service the WDT
-
-    ssta = CH376_USB_Del();
-    if(ssta == 0x55) Receiver_LED_OUT = 1;
-    else PIN_BEEP = 1;
+    IIC_PCF8563_INIT();
+    SetReal_Time(25,8,19,17,23,00,2);
+    while(1)
+    {
+        mDelaymS(1000);
+        GetReal_Time();
+    }
+    //ssta = CH376_USB_Del();
+    //if(ssta == 0x55) Receiver_LED_OUT = 1;
+    //else PIN_BEEP = 1;
     while(1)
     {
        ;

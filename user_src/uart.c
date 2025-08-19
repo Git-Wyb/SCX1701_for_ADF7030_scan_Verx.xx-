@@ -77,7 +77,6 @@ void UART1_end(void)
 //--------------------------------------------
 void UART1_RX_RXNE(void)
 { // RXD中断服务程序
-	unsigned char dat;
     if(USART1_SR_bit.RXNE == 1)
     {
         uart_rx_data = USART1_DR; // 接收数据

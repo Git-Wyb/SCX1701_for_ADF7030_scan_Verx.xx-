@@ -17,7 +17,7 @@
         <debug>1</debug>
         <option>
           <name>GenDeviceSelectMenu</name>
-          <state>STM8L151G6	STM8L151G6</state>
+          <state>STM8L151C6	STM8L151C6</state>
         </option>
         <option>
           <name>GenCodeModel</name>
@@ -1695,6 +1695,9 @@
     </file>
     <file>
       <name>$PROJ_DIR$\user_src\ID_Decode.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\user_src\IIC.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\user_src\Initial.c</name>
