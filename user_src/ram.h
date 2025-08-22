@@ -218,6 +218,9 @@ extern u16 BASE_TIME_BEEP_off;
 #define recv_429code_flag   flag1_Un.FlagByte_bit2  //1：接收到429MHz的闭操作指令
 #define close_action_beep_flag   flag1_Un.FlagByte_bit3  //1：接收到429MHz的闭操作指令后动作中信号输入，开启蜂鸣器
 #define flag_rx_done        flag1_Un.FlagByte_bit4
+#define flag_update_his     flag1_Un.FlagByte_bit5
+#define flag_rerx           flag1_Un.FlagByte_bit6
+#define flag_test_rtc       flag1_Un.FlagByte_bit7
 
 #define Save_Disable_Beep 0xAA
 
@@ -229,6 +232,9 @@ void ADF7030_RECEIVING_FROM_POWEROFF(void);
 void SCAN_RECEIVE_PACKET(void);
 u32 ConfigurationLen(void);
 
+#define BUFFMAX 10
+#define HIS_MAX 100
+
 typedef struct
 {
     UINT8 YY;
@@ -237,9 +243,16 @@ typedef struct
     UINT8 HH;
     UINT8 MI;
     UINT8 SS;
-    uni_rom_id IDD;
+    UINT8 IDD[3];
+    UINT8 CODE;
     UINT8 RS;
 }STRUCT_DATE;
+
+typedef union
+{
+    u8 history_buff[11];
+    STRUCT_DATE History_s;
+}HIS_STU;
 
 extern Wireless_Body Struct_DATA_Packet_Contro,Struct_DATA_Packet_Contro_buf;
 extern Wireless_Body Uart_Struct_DATA_Packet_Contro,Last_Uart_Struct_DATA_Packet_Contro;
@@ -267,6 +280,12 @@ extern u8 uart_rx_data;
 extern u8 FLAG_RTC_RTC;
 extern unsigned char g8563_Store[7];
 extern u8 FLAG_CLOCK;
-extern STRUCT_DATE NOW_DATE;
+extern STRUCT_DATE History_STU;
+extern u8 his_buff[BUFFMAX * 11];
+extern u8 b_offset;
+extern HIS_STU HIS_DATA[BUFFMAX];
+extern u8 His_Num;
+extern u16 His_AddrOffset;
+extern u16 ID_Nums;
 
 #endif

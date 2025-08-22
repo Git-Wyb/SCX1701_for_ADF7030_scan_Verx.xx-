@@ -15,7 +15,6 @@ void IIC_INIT(void)
 
 void IIC_PCF8563_INIT(void)
 {
-    IIC_INIT();
     Init8563();
 }
 
@@ -154,7 +153,7 @@ void Init8563(void)
  {
    /*秒、  分  、时、日期、星期、月、年 */
     unsigned char c8563_Store[7]={0x00,0x00,0x00,0x24,0x05,0x10,0x14}; /*写入时间初值：星期一 07:59:00*/
-
+    IIC_INIT();
     uchar i,ucAddr=0x02,Tp_data;
     FLAG_RTC_RTC = 1;//这个不重入
     Tp_data = Read8563(1);
@@ -243,12 +242,6 @@ void PCF8563_CLKOUT_OFF(void)
 void GetReal_Time(void)
 {
     GetTime();
-    NOW_DATE.YY = Now_Year;
-    NOW_DATE.MM = Now_Mon;
-    NOW_DATE.DD = Now_Day;
-    NOW_DATE.HH = Now_Hour;
-    NOW_DATE.MI = Now_Min;
-    NOW_DATE.SS = Now_Sec;
 }
 
 void SetReal_Time(UINT8 yy,UINT8 mm,UINT8 dd,UINT8 hh,UINT8 mi,UINT8 ss,UINT8 ww)//年月日时分秒周

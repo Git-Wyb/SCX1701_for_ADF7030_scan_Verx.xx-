@@ -30,9 +30,12 @@ void GetInitial_State(void);
 void sendsta_once(void);
 void BEEP_function(void);
 void _ReqBuzzer(u16 d_BEEP_on,u16 d_BEEP_off,u16 d_BEEP_freq);
-
-
+void Set_OperationHistory(u32 RX_ID,u8 code);
 void Freq_Scanning(void);
 void DataReceive(void);
+void Hisdata_Inbuff(u8 *baddr,STRUCT_DATE *pdata);
+void Save_OperationHistory(u16 paddr,HIS_STU *pdata,u8 datanum);
+u16 Get_IDNums(void);
+u8 CheckID_Type(u32 id);
 
 #endif

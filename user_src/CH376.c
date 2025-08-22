@@ -1,21 +1,26 @@
 #include "CH376.h"
 #include "CH376FileName.h"
+#include "IIC.h"
+#include "ID_Decode.h"
 
 UINT8 buf[100];
 UINT16 si = 0;
-UINT8 File_Name[] = {"Log_20250710_162210.txt"};
+UINT8 File_Name[] = {"Log_20250710_162210.txt"}; //文件名长名称
+UINT8 reFile_Name[] = "/LOGS/10102938.TXT"; //文件名长名称的替代名,不能重复。文件名 8+3格式 字母必须大写。文件名称最多只能8个字节
 UINT8 File_Data0[] = {"<Registered Remote Controls>\r\n"};
 UINT8 File_Data1[] = {"<Remote Control ID List>\r\n"};
 UINT8 File_Data2[] = {"<Operation History>\r\n"};
-UINT8 TYPE[] = {"STX0031"};
-UINT8 CTRL[] = {"CLOSE"};
+UINT8 File_IDNums[5] = {""};
+UINT8 File_ID[10] = {""};
+UINT8 *TYPE[] = {"STX0011","STX0031","STX1231","STX1531","CTX1531","STX1631","STX1731"};
+UINT8 *CTRL[] = {"OPEN","STOP","CLOSE"};
 
-UINT8	CH376FileOpen( PUINT8 name );
+UINT8 CH376FileOpen( PUINT8 name );
 UINT8 s = 0;
-
+UINT32 test_id = 0;
 UINT8 CH376_USB_Del(void)
 {
-    STRUCT_DATE HIS_DATA;
+    STRUCT_DATE H_DATA;
     if(CH376_HOST_INIT() != USB_INT_SUCCESS) return  ERR_USB_UNKNOWN;
     else
     {
@@ -35,48 +40,63 @@ UINT8 CH376_USB_Del(void)
             if ( s == USB_INT_SUCCESS || s == ERR_FOUND_NAME) {}
             else return ERR_USB_UNKNOWN;
 
-            s = CH376_CreateFile_Name("/LOGS/LOG_2025.TXT",File_Name); //新建文件
+            //GetTime();
+            g8563_Store[0] = 51;
+            g8563_Store[1] = 5;
+            g8563_Store[2] = 9;
+            g8563_Store[3] = 9;
+            g8563_Store[5] = 11;
+            g8563_Store[6] = 28;
+            sprintf(File_Name,"Log_20%0*d%0*d%0*d_%0*d%0*d%0*d.txt",2,g8563_Store[6],2,g8563_Store[5],2,g8563_Store[3],2,g8563_Store[2],2,g8563_Store[1],2,g8563_Store[0]);
+            sprintf(reFile_Name,"/LOGS/%0*d%0*d%0*d%0*d.TXT",2,g8563_Store[3],2,g8563_Store[2],2,g8563_Store[1],2,g8563_Store[0]);
+            s = CH376_CreateFile_Name(reFile_Name,File_Name); //新建文件
             if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
             Receiver_LED_RX = 1;
 
             //s = SetFileCreateTime( "LOG_2025.TXT", MAKE_FILE_DATE( 2025, 8, 15 ), MAKE_FILE_TIME( 10, 23, 14 ) );  /* 为指定文件设置创建日期和时间 */
             //if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
-            //mDelaymS( 200 );
-            s = CH376FileOpen("LOG_2025.TXT"); //上面已经新建/打开目录，所以此步不需要文件夹路径了。
+            //mDelaymS( 200 ); &reFile_Name[6]
+            s = CH376FileOpen(&reFile_Name[6]); //上面已经新建/打开目录，所以此步不需要文件夹路径了。
             if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
 
             s = strlen(File_Data0);
             s = CH376ByteWrite( File_Data0, s, NULL);
             if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
 
-            s = CH376ByteWrite( "3\r\n", 3, NULL);
+            ID_Nums = 10;//Get_IDNums();
+            s = sprintf(File_IDNums,"%d\r\n",ID_Nums);
+            s = CH376ByteWrite(File_IDNums, s, NULL);
             if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
 
             s = strlen(File_Data1);
             s = CH376ByteWrite(File_Data1, s, NULL);
             if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
 
-            s = CH376ByteWrite( "12345678\r\n", 10, NULL);
-            if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+            if(ID_Nums > 0)
+            {
+                s = sprintf(File_ID,"%ld\r\n",ID_SCX1801_DATA);
+                s = CH376ByteWrite(File_ID, s, NULL);
+                if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+                ID_Nums = ID_Nums - 1;
+            }
+            for(si=0; si<ID_Nums; si++)
+            {
+                s = sprintf(File_ID,"%ld\r\n",ID_Receiver_DATA_READ(&ID_Receiver_DATA[si][0]));
+                s = CH376ByteWrite(File_ID, s, NULL);
+                if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+            }
 
             s = strlen(File_Data2);
             s = CH376ByteWrite(File_Data2, s, NULL);
             if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
-            HIS_DATA.YY = 25;
-            HIS_DATA.MM = 8;
-            HIS_DATA.DD = 15;
-            HIS_DATA.HH = 14;
-            HIS_DATA.MI = 25;
-            HIS_DATA.SS = 30;
-            //TYPE = "STX0031";
-            HIS_DATA.IDD.IDL = 13475495;
-            //CTRL = "OPEN";
-            HIS_DATA.RS = 80;
+
+            test_id = 13475495;
+            H_DATA.RS = 80;
             for(si=1; si<=200; si++)
             {
                 mDelaymS( 10 );
-                s = sprintf( buf, "20%d/%0d/%0d_%0d:%0d:%0d_%s_%ld_%s_-%ddBm\r\n",HIS_DATA.YY,HIS_DATA.MM,HIS_DATA.DD,
-                            HIS_DATA.HH,HIS_DATA.MI,HIS_DATA.SS,TYPE,HIS_DATA.IDD.IDL,CTRL,HIS_DATA.RS);
+                s = sprintf( buf,"20%0*d/%0*d/%0*d_%0*d:%0*d:%0*d_%s_%ld_%s_-%ddBm\r\n",2,g8563_Store[6],2,g8563_Store[5],2,g8563_Store[3],
+                            2,g8563_Store[2],2,g8563_Store[1],2,g8563_Store[0],TYPE,test_id,CTRL,H_DATA.RS);
                 s = CH376ByteWrite( buf, s, NULL);
                 ClearWDT();
                 if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
@@ -462,9 +482,5 @@ UINT8	CH376WriteReqBlock( PUINT8 buf )  /* 向内部指定缓冲区写入请求�
 	}
 	return( s );
 }
-/*
-UINT8 Query376Interrupt( void )
-{
-	return( KEY_SW4 ? FALSE : TRUE );  // 如果连接了CH376的中断引脚则直接查询中断引脚
-}*/
+
 

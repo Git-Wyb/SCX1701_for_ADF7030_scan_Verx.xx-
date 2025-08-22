@@ -40,47 +40,25 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
-
 /* Private functions ---------------------------------------------------------*/
-
 /**
   * @brief  Main program.
   * @param  None
   * @retval None
   */
-u8 ssta = 0;
 
 void main(void)
 {
     _DI();             // 关全�?中断
     RAM_clean();       // 清除RAM
-    //WDT_init();        //看门狿
-    //VHF_GPIO_INIT();   //IO初始�?
+    WDT_init();        //看门狿
+    VHF_GPIO_INIT();   //IO初始�?
     SysClock_Init();   //系统时钟初始�?
     InitialFlashReg(); //flash EEPROM
-    time_sw = 0;
-    PIN_BEEP = 0;
-
-    //eeprom_sys_load(); //ID载入
+    eeprom_sys_load(); //ID载入
     TIM4_Init();       // 定时�?
-    _EI();
     //beep_init();       // 蜂鸣�?
     ClearWDT(); // Service the WDT
-    IIC_PCF8563_INIT();
-    SetReal_Time(25,8,19,17,23,00,2);
-    while(1)
-    {
-        mDelaymS(1000);
-        GetReal_Time();
-    }
-    //ssta = CH376_USB_Del();
-    //if(ssta == 0x55) Receiver_LED_OUT = 1;
-    //else PIN_BEEP = 1;
-    while(1)
-    {
-       ;
-    }
-
     PROFILE_CH_FREQ_32bit_200002EC = 426075000;
     PROFILE_RADIO_AFC_CFG1_32bit_2000031C = 0x0005005A;
     PROFILE_RADIO_DATA_RATE_32bit_200002FC = 0x6400000C;
@@ -90,6 +68,7 @@ void main(void)
     _EI();         // 允许中断
     ClearWDT(); // Service the WDT
     RF_test_mode();
+    PCF8563_CLKOUT_OFF();
     TIME_power_led = 500;
 
     //  FLAG_APP_RX = 1;
@@ -101,7 +80,7 @@ void main(void)
     GetInitial_State();
     Status_Un.Receive_SignalType = 1;
     APP429M_Tx_State(); //上电发送一次状态
-
+    //Read_HisData(AddrEeprom_StartHistory,6);
     while (1)
     {
         ClearWDT(); // Service the WDT

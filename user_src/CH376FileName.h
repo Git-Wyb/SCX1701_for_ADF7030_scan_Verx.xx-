@@ -5,7 +5,7 @@
 
 #define	STRUCT_OFFSET( s, m )	( (UINT8)( & ((s *)0) -> m ) )	/* 定义获取结构成员相对偏移地址的宏 */
 
-#define	LONG_NAME_BUF_LEN	( LONG_NAME_PER_DIR * 20 )	/* 自行定义的长文件名缓冲区长度,最小值为LONG_NAME_PER_DIR*1 */
+#define	LONG_NAME_BUF_LEN	( LONG_NAME_PER_DIR * 10 )	/* 自行定义的长文件名缓冲区长度,最小值为LONG_NAME_PER_DIR*1 */
 UINT8	CH376FileOpenDir( PUINT8 PathName, UINT8 StopName );
 UINT8	CH376FileOpenPath( PUINT8 PathName );
 UINT8	CH376SeparatePath( PUINT8 path );

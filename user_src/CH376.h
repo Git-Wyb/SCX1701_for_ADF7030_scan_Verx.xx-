@@ -6,7 +6,6 @@
 #include "CH376INC.H"
 #include "type_def.h"
 #include "uart.h"
-#include "CH376.h"
 #include "ram.h"
 #include "Pin_define.h"
 #include <iostm8l151g4.h>

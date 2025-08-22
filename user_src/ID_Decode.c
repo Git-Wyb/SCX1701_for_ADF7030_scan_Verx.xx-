@@ -14,6 +14,7 @@
 #include "eeprom.h" // eeprom
 #include "uart.h"   // uart
 #include "ADF7030_1.h"
+#include "IIC.h"
 //void EXIT_init(void)
 //{
 //    EXTI_CR1 = 0x20;          //PORT B2  的中�?触发�?
@@ -69,7 +70,7 @@ void DataReceive(void)
     }
     EXTI_SR1_P4F = 1;
 }
-
+u8 rrss = 0;
 void ID_Decode_IDCheck(void)
 {
     ClearWDT();
@@ -89,8 +90,14 @@ void ID_Decode_IDCheck(void)
                 {
                     if ((FLAG_ID_Erase_Login == 1) || (((FLAG_ID_Login == 1) ||(FLAG_ID_SCX1801_Login==1))&&(DATA_Packet_ID != 0xFFFFFE)))
                     {
-                        FLAG_ID_Login_OK = 1;
-	                    ID_Receiver_Login = DATA_Packet_ID;
+                        rrss=RAM_RSSI_AVG/128;
+                        rrss=-rrss;
+                        if(rrss>=127)rrss=127;
+                        if(rrss <= 50)
+                        {
+                            FLAG_ID_Login_OK = 1;
+                            ID_Receiver_Login = DATA_Packet_ID;
+                        }
                     }
                 }
             }
@@ -663,6 +670,7 @@ void ID_Decode_OUT(void)
                     Tone_OFF();  //只要接收到操作指令就关闭蜂鸣器
                     close_action_auto_beep_flag = 0;
                     beep_num = 0;
+                    if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,Control_i);
                     if(Status_Un.PROFILE_RxLowSpeed_TYPE == 0)   //426M
                     {
                         Receiver_OUT_OPEN = FG_NOT_allow_out;
@@ -705,6 +713,7 @@ void ID_Decode_OUT(void)
                     Receiver_OUT_OPEN = FG_NOT_allow_out;
                     Receiver_OUT_CLOSE = FG_NOT_allow_out;
                     Receiver_OUT_VENT = FG_NOT_allow_out;
+                    if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,Control_i);
                     if(Status_Un.PROFILE_RxLowSpeed_TYPE == 0)    //426M
                     {
                         if(TIMER1s < 985) Receiver_OUT_STOP = FG_allow_out;
@@ -729,6 +738,7 @@ void ID_Decode_OUT(void)
                     close_action_beep_flag = 0;
                     beep_num = 0;
                     recv_429code_flag = 0;
+                    if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,Control_i);
                     if(Status_Un.PROFILE_RxLowSpeed_TYPE == 0)   //426M
                     {
                         Receiver_OUT_STOP = FG_NOT_allow_out;
@@ -1102,7 +1112,12 @@ void ID_Decode_OUT(void)
                 eeprom_write_byte(AddrEeprom_BuzzerSwitch,0x01);
             }
         }
-
+        flag_rerx = 0;
+        if(flag_update_his)
+        {
+            flag_update_his = 0;
+            Save_OperationHistory(His_AddrOffset,HIS_DATA,b_offset);
+        }
         FLAG_Receiver_BEEP = 0;
 		Receiver_OUT_OPEN = FG_NOT_allow_out;
 		Receiver_OUT_VENT = FG_NOT_allow_out;
@@ -1488,4 +1503,85 @@ void _ReqBuzzer(u16 d_BEEP_on,u16 d_BEEP_off,u16 d_BEEP_freq)
     TIME_BEEP_on = BASE_TIME_BEEP_on;
     TIME_BEEP_off = BASE_TIME_BEEP_off;
     TIME_BEEP_freq = d_BEEP_freq - 1;
+}
+
+void Set_OperationHistory(u32 RX_ID,u8 code)
+{
+    u8 rrssi = 0;
+    GetTime();
+    if(b_offset >= 10) b_offset = 0;
+    flag_update_his = 1;
+    flag_rerx = 1;
+    HIS_DATA[b_offset].History_s.YY = Now_Year;
+    HIS_DATA[b_offset].History_s.MM = Now_Mon;
+    HIS_DATA[b_offset].History_s.DD = Now_Day;
+    HIS_DATA[b_offset].History_s.HH = Now_Hour;
+    HIS_DATA[b_offset].History_s.MI = Now_Min;
+    HIS_DATA[b_offset].History_s.SS = Now_Sec;
+    HIS_DATA[b_offset].History_s.IDD[0] = (RX_ID >> 16) & 0xFF;
+    HIS_DATA[b_offset].History_s.IDD[1] = (RX_ID >> 8) & 0xFF;
+    HIS_DATA[b_offset].History_s.IDD[2] = (RX_ID) & 0xFF;
+    HIS_DATA[b_offset].History_s.CODE = code;
+    rrssi=RAM_RSSI_AVG/128;
+    rrssi=-rrssi;
+    if(rrssi>=127)rrssi=127;
+    HIS_DATA[b_offset].History_s.RS = rrssi;
+    b_offset++;
+}
+
+void Save_OperationHistory(u16 paddr,HIS_STU *pdata,u8 datanum)
+{
+    u8 i,j;
+    if(datanum > BUFFMAX) datanum = BUFFMAX;
+    His_Num += datanum;
+    if(His_Num > HIS_MAX) His_Num = HIS_MAX;
+    if(paddr < AddrEeprom_StartHistory || paddr > AddrEeprom_MAX-10) paddr = AddrEeprom_StartHistory;
+
+    UnlockFlash(UNLOCK_EEPROM_TYPE);
+    for(i = 0; i < datanum; i++)
+    {
+        for(j = 0; j < 11; j++)
+        {
+            ClearWDT();
+            WriteByteToFLASH(addr_eeprom_sys + paddr, pdata->history_buff[j]);
+            paddr++;
+        }
+        pdata++;
+        if(paddr < AddrEeprom_StartHistory || paddr > AddrEeprom_MAX-10) paddr = AddrEeprom_StartHistory;
+    }
+    i = (u8)((paddr >> 8) & 0xFF);
+    j = (u8)(paddr & 0xFF);
+    His_AddrOffset = paddr;
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_HisOffsetH,i);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_HisOffsetL,j);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_HisNum,His_Num);
+    LockFlash(UNLOCK_EEPROM_TYPE);
+    b_offset = 0;
+}
+
+void Read_LoginID(void)
+{
+    u8 i = 0;
+    for(i=0; i<ID_DATA_PCS; i++)
+    {
+        ID_Receiver_DATA_READ(ID_Receiver_DATA[i*3]);
+    }
+}
+
+u16 Get_IDNums(void)
+{
+    if ((ID_SCX1801_DATA == 0) || (ID_SCX1801_DATA == 0xFFFFFF)) return 0;
+    else return (ID_DATA_PCS + 1);
+}
+
+u8 CheckID_Type(u32 id)
+{
+    if(11000000 <= id && id < 12000000) return 1;
+    if(13000000 <= id && id < 15000000) return 2;
+    if(15000000 <= id && id < 16000000) return 3;
+    if( 2000000 <= id && id <  3000000) return 4;
+    if( 3000000 <= id && id <  4000000) return 5;
+    if( 4000000 <= id && id <  5000000) return 6;
+    if(15100000 <= id && id < 15200000) return 7;
+    return 0;
 }

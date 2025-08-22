@@ -193,7 +193,11 @@ u8 uart_rx_data = 0;
 u8 FLAG_RTC_RTC = 0;
 unsigned char g8563_Store[7]={0x00,0x59,0x07,0x01,0x01,0x01,0x14}; /*时间交换区,全局变量声明*/
 u8 FLAG_CLOCK = 0;
-STRUCT_DATE NOW_DATE = {0};
-
-
+STRUCT_DATE History_STU = {0};
+u8 his_buff[BUFFMAX * 11] = {0};
+u8 b_offset = 0;
+u8 His_Num = 0;
+u16 ID_Nums = 0;
+u16 His_AddrOffset = 0;
+HIS_STU HIS_DATA[BUFFMAX] = {0};
 

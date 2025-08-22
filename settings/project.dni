@@ -1,6 +1,6 @@
 [DebugChecksum]
 <<<<<<< HEAD
-Checksum=1988213460
+Checksum=653485201
 =======
 Checksum=773928336
 >>>>>>> f03119bb9d9418453f7da9e2e3549a267f3e0d0b
@@ -79,20 +79,23 @@ ShowSource=1
 Freq=16000000
 [struct_types]
 Fmt0=ADF70XX_REG_T-whole_reg	1	0
-Fmt1=STRUCT_DATE-DD	3	0
-Fmt2=STRUCT_DATE-HH	3	0
-Fmt3=STRUCT_DATE-MI	3	0
-Fmt4=STRUCT_DATE-MM	3	0
-Fmt5=STRUCT_DATE-SS	3	0
-Fmt6=STRUCT_DATE-YY	3	0
-Fmt7=uFLAG-BYTE	4	0
+Fmt1=STRUCT_DATE-CODE	4	0
+Fmt2=STRUCT_DATE-DD	3	0
+Fmt3=STRUCT_DATE-HH	3	0
+Fmt4=STRUCT_DATE-MI	3	0
+Fmt5=STRUCT_DATE-MM	3	0
+Fmt6=STRUCT_DATE-RS	3	0
+Fmt7=STRUCT_DATE-SS	3	0
+Fmt8=STRUCT_DATE-YY	3	0
+Fmt9=uFLAG-BYTE	4	0
 [array_types]
 Fmt0=u32_t[6]	4	0
 Fmt1=u32_t[7]	4	0
-Fmt2=unsigned char[3]	4	0
-Fmt3=unsigned char[4]	4	0
-Fmt4=unsigned char[7]	3	0
-Fmt5=unsigned char[9]	4	0
+Fmt2=u8_t[55]	3	0
+Fmt3=unsigned char[3]	4	0
+Fmt4=unsigned char[4]	4	0
+Fmt5=unsigned char[7]	3	0
+Fmt6=unsigned char[9]	4	0
 [watch_formats]
 Fmt0={W}0:COUNT_Receiver_Login	3	0
 Fmt1={W}0:RAM_rssi_AVG	3	0
@@ -105,20 +108,22 @@ Fmt7={W}1:PREAMBLE_UNIT	3	0
 Fmt8={W}1:TRX_IRQ0_TYPE	3	0
 Fmt9={W}1:TRX_IRQ1_TYPE	3	0
 Fmt10={W}42:ADF7030_RESIGER_VALUE_READ	4	0
-Fmt11={W}42:Status_Un.Buzzer_Switch	4	0
-Fmt12={W}42:Time_StateDetection	3	0
-Fmt13={W}42:Tx_Rx_mode	4	0
-Fmt14={W}42:ass	4	0
-Fmt15={W}42:cache	4	0
-Fmt16={W}42:dat	4	0
-Fmt17={W}42:ints	3	0
-Fmt18={W}42:l	3	0
-Fmt19={W}42:res	4	0
-Fmt20={W}42:s	4	0
-Fmt21={W}42:scct	4	0
-Fmt22={W}42:ssta	4	0
-Fmt23={W}42:time_receive_auto	3	0
-Fmt24={W}42:uart_rx_data	4	0
+Fmt11={W}42:His_AddrOffset	4	0
+Fmt12={W}42:Status_Un.Buzzer_Switch	4	0
+Fmt13={W}42:Time_StateDetection	3	0
+Fmt14={W}42:Tx_Rx_mode	4	0
+Fmt15={W}42:ass	4	0
+Fmt16={W}42:cache	4	0
+Fmt17={W}42:dat	4	0
+Fmt18={W}42:ints	3	0
+Fmt19={W}42:l	3	0
+Fmt20={W}42:res	4	0
+Fmt21={W}42:rrss	3	0
+Fmt22={W}42:s	4	0
+Fmt23={W}42:scct	4	0
+Fmt24={W}42:ssta	4	0
+Fmt25={W}42:time_receive_auto	3	0
+Fmt26={W}42:uart_rx_data	4	0
 [DataSample]
 LogEnabled=0
 GraphEnabled=0

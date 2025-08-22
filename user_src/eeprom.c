@@ -189,6 +189,14 @@ void eeprom_sys_load(void)
     UINT8 xm[3] = {0};
     uni_rom_id xn;
 
+    His_Num = (0xFF & ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_HisNum));
+    if(His_Num > HIS_MAX) His_Num = HIS_MAX;
+
+    i = (0xFF & ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_HisOffsetH));
+    j = (0xFF & ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_HisOffsetL));
+    His_AddrOffset = (u16)((i << 8) | j);
+    if(His_AddrOffset<AddrEeprom_StartHistory || His_AddrOffset>AddrEeprom_MAX) His_AddrOffset = AddrEeprom_StartHistory;
+
     auto_over_time = (0xFF & ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_AutoOverTime)); //读取设定的自动下降时间
     if(auto_over_time < 1 || auto_over_time > 13) auto_over_time = 4;   //The initial default is 30 seconds
 
@@ -202,9 +210,9 @@ void eeprom_sys_load(void)
         Status_Un.Buzzer_Switch = 1;   //初始默认可以开启蜂鸣器
     }
 
-    xm[0] = ReadByteEEPROM(addr_eeprom_sys + 0x3FB);
-    xm[1] = ReadByteEEPROM(addr_eeprom_sys + 0x3FC);
-    xm[2] = ReadByteEEPROM(addr_eeprom_sys + 0x3FD);
+    xm[0] = ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_CommIDH);
+    xm[1] = ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_CommIDM);
+    xm[2] = ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_CommIDL);
     xn.IDB[0] = 0;
     xn.IDB[1] = xm[0];
     xn.IDB[2] = xm[1];
@@ -218,8 +226,8 @@ void eeprom_sys_load(void)
     for (i = 0; i < 256; i++)
         //ID_Receiver_DATA[i] = 0; //ID_Receiver_DATA[ID_DATA_PCS]=0;
         ID_Receiver_DATA_WRITE(ID_Receiver_DATA[i], 0);
-    xm[0] = ReadByteEEPROM(addr_eeprom_sys + 0x3FE);
-    xm[1] = ReadByteEEPROM(addr_eeprom_sys + 0x3FF);
+    xm[0] = ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_IDPcsH);
+    xm[1] = ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_IDPcsL);
     ID_DATA_PCS = xm[0] * 256 + xm[1];
     if (ID_DATA_PCS == 0xFFFF)
         ID_DATA_PCS = 0;
@@ -248,7 +256,7 @@ void eeprom_sys_load(void)
             break;
         ClearWDT(); // Service the WDT
     }
-
+    /*
     for (i = 1; i < 2; i++)
     {
         j = 0x380 + i * 4;
@@ -258,7 +266,7 @@ void eeprom_sys_load(void)
         ROM_adf7030_value[i].byte[3] = ReadByteEEPROM(addr_eeprom_sys + j + 3);
         if ((ROM_adf7030_value[i].whole_reg == 0) || (ROM_adf7030_value[i].whole_reg == 0xFFFFFFFF))
             ROM_adf7030_value[i] = Default_adf7030_value[i];
-    }
+    }*/
 }
 
 void ALL_ID_EEPROM_Erase(void)
@@ -271,8 +279,8 @@ void ALL_ID_EEPROM_Erase(void)
 
     ID_DATA_PCS = 0;
     UnlockFlash(UNLOCK_EEPROM_TYPE);
-    WriteByteToFLASH(addr_eeprom_sys + 0x3FE, xm[1]);
-    WriteByteToFLASH(addr_eeprom_sys + 0x3FF, xm[0]);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_IDPcsH, xm[1]);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_IDPcsL, xm[0]);
     LockFlash(UNLOCK_EEPROM_TYPE);
 
     for (i = 0; i < 256; i++)
@@ -300,8 +308,8 @@ void ID_EEPROM_write(void)
     xm[1] = ID_DATA_PCS / 256;
 
     UnlockFlash(UNLOCK_EEPROM_TYPE);
-    WriteByteToFLASH(addr_eeprom_sys + 0x3FE, xm[1]);
-    WriteByteToFLASH(addr_eeprom_sys + 0x3FF, xm[0]);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_IDPcsH, xm[1]);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_IDPcsL, xm[0]);
     LockFlash(UNLOCK_EEPROM_TYPE);
 
     //ID_Receiver_DATA[ID_DATA_PCS - 1] = ID_Receiver_Login;
@@ -356,10 +364,9 @@ void ID_SCX1801_EEPROM_write(u32 id)
     xm[1] = xn.IDB[2];
     xm[2] = xn.IDB[3];
     UnlockFlash(UNLOCK_EEPROM_TYPE);
-    WriteByteToFLASH(addr_eeprom_sys + 0x3FB, xm[0]);
-    WriteByteToFLASH(addr_eeprom_sys + 0x3FC, xm[1]);
-
-    WriteByteToFLASH(addr_eeprom_sys + 0x3FD, xm[2]);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_CommIDH, xm[0]);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_CommIDM, xm[1]);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_CommIDL, xm[2]);
     LockFlash(UNLOCK_EEPROM_TYPE);
 }
 void Delete_GeneralID_EEPROM(u32 id)
@@ -393,8 +400,8 @@ void Delete_GeneralID_EEPROM(u32 id)
     xm[0] = ID_DATA_PCS % 256;
     xm[1] = ID_DATA_PCS / 256;
     UnlockFlash(UNLOCK_EEPROM_TYPE);
-    WriteByteToFLASH(addr_eeprom_sys + 0x3FE, xm[1]);
-    WriteByteToFLASH(addr_eeprom_sys + 0x3FF, xm[0]);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_IDPcsH, xm[1]);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_IDPcsL, xm[0]);
     LockFlash(UNLOCK_EEPROM_TYPE);
 
     for (i = 0; i < original_pcs; i++)
@@ -426,8 +433,8 @@ void ID_EEPROM_write_0x00(void)
     xm[1] = ID_DATA_PCS / 256;
 
     UnlockFlash(UNLOCK_EEPROM_TYPE);
-    WriteByteToFLASH(addr_eeprom_sys + 0x3FE, xm[1]);
-    WriteByteToFLASH(addr_eeprom_sys + 0x3FF, xm[0]);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_IDPcsH, xm[1]);
+    WriteByteToFLASH(addr_eeprom_sys + AddrEeprom_IDPcsL, xm[0]);
     LockFlash(UNLOCK_EEPROM_TYPE);
 
     for (i = 0; i < 256; i++)
@@ -728,11 +735,22 @@ void ID_Login_EXIT_Initial(void)
     //#endif
 }
 
-
-
 void eeprom_write_byte(u16 addr,u8 data)
 {
     UnlockFlash(UNLOCK_EEPROM_TYPE);
     WriteByteToFLASH(addr_eeprom_sys + addr, data);
     LockFlash(UNLOCK_EEPROM_TYPE);
+}
+
+void Read_HisData(u16 padd,u8 rnum)
+{
+    u8 i,j;
+    for(i=0; i < rnum; i++)
+    {
+        for(j=0; j<11; j++)
+        {
+            HIS_DATA[i].history_buff[j] = ReadByteEEPROM(addr_eeprom_sys + padd);
+            padd++;
+        }
+    }
 }

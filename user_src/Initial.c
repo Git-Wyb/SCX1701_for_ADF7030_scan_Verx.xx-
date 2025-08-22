@@ -421,6 +421,7 @@ void RF_BRE_Check(void)
     if (X_ERRTimer == 0)
         Receiver_LED_RX = 0;
 }
+void PCF8563_CLKOUT_ON(void);
 void RF_test_mode(void)
 {
     u8 Flag_TP4 = 0;
@@ -451,6 +452,11 @@ void RF_test_mode(void)
     while (Receiver_test == 0)
     {
        ClearWDT();   // Service the WDT
+       if(flag_test_rtc == 0)
+       {
+           flag_test_rtc = 1;
+           PCF8563_CLKOUT_ON();
+       }
         if((TP4 == 0)&&(Flag_TP4==0))   //不使用TP3，因为测试模式TP3与工作模式换气输出有冲突，冲突为三极管导致TP3的高电平只有0.8V
         {
             if (FG_10ms==1)
