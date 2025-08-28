@@ -20,7 +20,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include <iostm8l151g4.h> // CPU型号
+#include <iostm8l151c8.h> // CPU型号
 #include "Pin_define.h"   // 管脚定义
 #include "initial.h"      // 初始�?  预定�?
 #include "ram.h"          // RAM定义
@@ -67,6 +67,7 @@ void main(void)
     //UART1_INIT();  // UART1 for PC Software
     _EI();         // 允许中断
     ClearWDT(); // Service the WDT
+    GetInit_SwState();
     RF_test_mode();
     PCF8563_CLKOUT_OFF();
     TIME_power_led = 500;
@@ -80,7 +81,7 @@ void main(void)
     GetInitial_State();
     Status_Un.Receive_SignalType = 1;
     APP429M_Tx_State(); //上电发送一次状态
-    //Read_HisData(AddrEeprom_StartHistory,6);
+    TF1_POWER = 1;
     while (1)
     {
         ClearWDT(); // Service the WDT
@@ -128,7 +129,13 @@ void main(void)
         {
             Beep_Action_On();
         }
-        if(ID_SCX1801_DATA == 0)    app_tx_en = 0;
+        if(ID_SCX1801_DATA == 0 || flag_sw_f429m == 0)    app_tx_en = 0;
+        if(Time_SwDetection == 0)   Dip_Sw_Detection();
+        if(flag_sw_usb == 0 && flag_usb_write == 0)
+        {
+            flag_usb_state = CH376_USB_Del();
+            flag_usb_write = 1;
+        }
     }
 }
 

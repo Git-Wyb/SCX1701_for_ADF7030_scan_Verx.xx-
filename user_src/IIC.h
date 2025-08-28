@@ -4,7 +4,7 @@
 #include "type_def.h"
 #include "Pin_define.h"
 #include "Timer.h"
-#include <iostm8l151g4.h>
+#include <iostm8l151c8.h>
 #include "initial.h"
 #include "ram.h"
 

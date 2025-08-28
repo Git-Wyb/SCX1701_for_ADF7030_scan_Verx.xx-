@@ -28,6 +28,7 @@ void ID_Login_EXIT_Initial(void);
 void ID_learn(void);
 void eeprom_write_byte(u16 addr,u8 data);
 void Read_HisData(u16 padd,u8 rnum);
+u32 R_ID(u8 *pid);
 /************************************************/
 
 #define UNLOCK_FLASH_TYPE ((unsigned char)0x00)

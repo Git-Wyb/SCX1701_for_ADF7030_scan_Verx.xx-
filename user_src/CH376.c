@@ -2,6 +2,7 @@
 #include "CH376FileName.h"
 #include "IIC.h"
 #include "ID_Decode.h"
+#include "eeprom.h"
 
 UINT8 buf[100];
 UINT16 si = 0;
@@ -20,11 +21,14 @@ UINT8 s = 0;
 UINT32 test_id = 0;
 UINT8 CH376_USB_Del(void)
 {
-    STRUCT_DATE H_DATA;
+    //STRUCT_DATE H_DATA;
+    u16 Paddr = AddrEeprom_StartHistory;
+    u32 r_id = 0;
     if(CH376_HOST_INIT() != USB_INT_SUCCESS) return  ERR_USB_UNKNOWN;
     else
     {
-        if(CH376DiskConnect() != USB_INT_SUCCESS) return  ERR_USB_UNKNOWN;
+        s = CH376DiskConnect();
+        if(s != USB_INT_SUCCESS) return  s;
         else
         {
             mDelaymS( 200 );/* 延时,可选操作,有的USB存储器需要几十毫秒的延时 */
@@ -40,18 +44,12 @@ UINT8 CH376_USB_Del(void)
             if ( s == USB_INT_SUCCESS || s == ERR_FOUND_NAME) {}
             else return ERR_USB_UNKNOWN;
 
-            //GetTime();
-            g8563_Store[0] = 51;
-            g8563_Store[1] = 5;
-            g8563_Store[2] = 9;
-            g8563_Store[3] = 9;
-            g8563_Store[5] = 11;
-            g8563_Store[6] = 28;
-            sprintf(File_Name,"Log_20%0*d%0*d%0*d_%0*d%0*d%0*d.txt",2,g8563_Store[6],2,g8563_Store[5],2,g8563_Store[3],2,g8563_Store[2],2,g8563_Store[1],2,g8563_Store[0]);
-            sprintf(reFile_Name,"/LOGS/%0*d%0*d%0*d%0*d.TXT",2,g8563_Store[3],2,g8563_Store[2],2,g8563_Store[1],2,g8563_Store[0]);
+            GetTime();
+            sprintf(File_Name,"Log_20%0*d%0*d%0*d_%0*d%0*d%0*d.txt",2,Now_Year,2,Now_Mon,2,Now_Day,2,Now_Hour,2,Now_Min,2,Now_Sec);
+            sprintf(reFile_Name,"/LOGS/%0*d%0*d%0*d%0*d.TXT",2,Now_Day,2,Now_Hour,2,Now_Min,2,Now_Sec);
             s = CH376_CreateFile_Name(reFile_Name,File_Name); //新建文件
             if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
-            Receiver_LED_RX = 1;
+            //Receiver_LED_RX = 1;
 
             //s = SetFileCreateTime( "LOG_2025.TXT", MAKE_FILE_DATE( 2025, 8, 15 ), MAKE_FILE_TIME( 10, 23, 14 ) );  /* 为指定文件设置创建日期和时间 */
             //if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
@@ -59,11 +57,16 @@ UINT8 CH376_USB_Del(void)
             s = CH376FileOpen(&reFile_Name[6]); //上面已经新建/打开目录，所以此步不需要文件夹路径了。
             if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
 
+            Receiver_LED_RX = 0;
+            Receiver_LED_TX = 0;
+            Receiver_LED_OUT = 0;
+            PowerLED = 0;
+            flag_usb_state = 1;
             s = strlen(File_Data0);
             s = CH376ByteWrite( File_Data0, s, NULL);
             if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
 
-            ID_Nums = 10;//Get_IDNums();
+            ID_Nums = Get_IDNums();
             s = sprintf(File_IDNums,"%d\r\n",ID_Nums);
             s = CH376ByteWrite(File_IDNums, s, NULL);
             if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
@@ -90,16 +93,21 @@ UINT8 CH376_USB_Del(void)
             s = CH376ByteWrite(File_Data2, s, NULL);
             if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
 
-            test_id = 13475495;
-            H_DATA.RS = 80;
-            for(si=1; si<=200; si++)
+            for(si=0; si<His_Num; si++)
             {
                 mDelaymS( 10 );
-                s = sprintf( buf,"20%0*d/%0*d/%0*d_%0*d:%0*d:%0*d_%s_%ld_%s_-%ddBm\r\n",2,g8563_Store[6],2,g8563_Store[5],2,g8563_Store[3],
-                            2,g8563_Store[2],2,g8563_Store[1],2,g8563_Store[0],TYPE,test_id,CTRL,H_DATA.RS);
+                Read_HisData(Paddr,1);
+                r_id = ID_Receiver_DATA_READ(HIS_DATA[0].History_s.IDD);
+                if(HIS_DATA[0].History_s.CODE == 0x08) s = 0;
+                else if (HIS_DATA[0].History_s.CODE == 0x04) s = 1;
+                else if (HIS_DATA[0].History_s.CODE == 0x02) s = 2;
+                else s = 1;
+                s = sprintf( buf,"20%0*d/%0*d/%0*d_%0*d:%0*d:%0*d_%s_%ld_%s_-%ddBm\r\n",2,HIS_DATA[0].History_s.YY,2,HIS_DATA[0].History_s.MM,2,HIS_DATA[0].History_s.DD,
+                            2,HIS_DATA[0].History_s.HH,2,HIS_DATA[0].History_s.MI,2,HIS_DATA[0].History_s.SS,TYPE[CheckID_Type(r_id)],r_id,CTRL[s],HIS_DATA[0].History_s.RS);
                 s = CH376ByteWrite( buf, s, NULL);
                 ClearWDT();
                 if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
+                Paddr += 11;
             }
 
             s = CH376FileClose( TRUE );  /* 关闭文件,自动更新文件长度 */
@@ -114,6 +122,9 @@ UINT8 CH376_USB_Del(void)
 void CH376_PORT_INIT(void)
 {
     UART1_INIT();
+    PCF8563_RSTI = 1;
+    mDelaymS(50);
+    PCF8563_RSTI = 0;
 }
 
 UINT8 res = 0;
@@ -138,7 +149,7 @@ REINIT:
             return( ERR_USB_UNKNOWN );  /* 通讯接口不正常,可能原因有:接口连接异常,其它设备影响(片选不唯一),串口波特率,一直在复位,晶振不工作 */
         }
     }
-    Receiver_LED_TX = 1;
+    //Receiver_LED_TX = 1;
     re_cnt = 0;
 
 REHOST:
@@ -175,6 +186,7 @@ UINT8 CH376DiskConnect(void)
         mDelaymS(100);
         if(CH376GetIntStatus() == USB_INT_SUCCESS) return  USB_INT_SUCCESS;
         if(sta++ > 6000) return ERR_USB_UNKNOWN;  //等待10分钟超时
+        if(SW_USB_IN == 1) return 2;
     }
 }
 
@@ -482,5 +494,3 @@ UINT8	CH376WriteReqBlock( PUINT8 buf )  /* 向内部指定缓冲区写入请求�
 	}
 	return( s );
 }
-
-

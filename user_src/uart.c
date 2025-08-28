@@ -6,12 +6,13 @@
 /*  DESCRIPTION :                                                      */
 /*  Mark        :ver 1.0                                               */
 /***********************************************************************/
-#include <iostm8l151g4.h> // CPU型号
+#include <iostm8l151c8.h> // CPU型号
 #include "Pin_define.h"   // 管脚定义
 #include "initial.h"	  // 初始�? 预定�?
 #include "ram.h"		  // RAM定义
 #include "eeprom.h"		  // eeprom
 #include "uart.h"
+#include "IIC.h"
 #define TXD1_enable (USART1_CR2 = 0x08) // 允许发�??
 #define RXD1_enable (USART1_CR2 = 0x24) // 允许接收及其中断
 
@@ -99,6 +100,112 @@ void UART1_RX_RXNE(void)
 	// }
 }
 
+void UART2_INIT(void)
+{
+	unsigned int baud_div = 0;
+
+    CLK_PCKENR3 = 0x08; //CLK_PCKENR3_UASRT2;
+	USART2_CR1_bit.M = 0;
+	USART2_CR1_bit.PCEN = 0;
+	USART2_CR1_bit.PS = 0;
+	USART2_CR2_bit.TIEN = 0;
+	USART2_CR2_bit.TCIEN = 0;
+	USART2_CR2_bit.RIEN = 1;
+	USART2_CR2_bit.ILIEN = 0;
+	USART2_CR2_bit.TEN = 1;
+	USART2_CR2_bit.REN = 1;
+
+	/*设置波特玿 */
+	baud_div = 16000000 / 9600; /*求出分频因子*/
+	USART2_BRR2 = baud_div & 0x0f;
+	USART2_BRR2 |= ((baud_div & 0xf000) >> 8);
+	USART2_BRR1 = ((baud_div & 0x0ff0) >> 4); /*先给BRR2赋忿朿后再设置BRR1*/
+}
+
+void UART2_End(void)
+{
+    USART2_CR1 = 0;
+    USART2_CR2 = 0;
+}
+
+void UART2_RX_RXNE(void)
+{ // RXD中断服务程序
+    unsigned char dat = 0;
+    if(USART2_SR_bit.RXNE == 1)
+    {
+        dat = USART2_DR; // 接收数据
+        if(dat == '(' || Uart2_Recv_Buff[0] == '(')
+        {
+            Uart2_Recv_Buff[Uart2_Cnt++] = dat;
+            if(dat == ')')
+            {
+                Uart2_Recv_Buff[0] = 0;
+                Uart2_Cnt = 0;
+                flag_uart2_rx = 1;
+            }
+            if(Uart2_Cnt > BUFFMAX - 1)
+            {
+                Uart2_Cnt = 0;
+                Uart2_Recv_Buff[0] = 0;
+                flag_uart2_rx = 0;
+            }
+        }
+    }
+}
+
+void UART2_Send_char(unsigned char ch)
+{
+    while (!USART2_SR_TXE);
+	USART2_DR = ch; // 发鿿
+	while (!USART2_SR_TC);
+}
+
+u8 Uart2_RTC_Write(void)
+{
+    STRUCT_DATE DATE_Set = {0};
+    u8 week = 0; u8 i = 0;
+
+    DATE_Set.YY = Uart2_Recv_Buff[2];  //年
+    DATE_Set.MM = Uart2_Recv_Buff[3];  //月
+    DATE_Set.DD = Uart2_Recv_Buff[4];  //日
+    DATE_Set.HH = Uart2_Recv_Buff[5];  //时
+    DATE_Set.MI = Uart2_Recv_Buff[6];  //分
+    DATE_Set.SS = Uart2_Recv_Buff[7];  //秒
+    week = Uart2_Recv_Buff[8];  //周
+
+    if(DATE_Set.YY>99 || DATE_Set.MM>12 || DATE_Set.DD>31 || DATE_Set.HH>24 || DATE_Set.MI>59 || DATE_Set.SS>59 \
+       || week>7 || DATE_Set.DD==0 || DATE_Set.MM==0)
+    {
+        UART2_Send_char('(');
+        UART2_Send_char(0);
+        UART2_Send_char(')');
+        return 0xFF;
+    }
+    SetReal_Time(DATE_Set.YY,DATE_Set.MM,DATE_Set.DD,DATE_Set.HH,DATE_Set.MI,DATE_Set.SS,week);
+
+    UART2_Send_char('(');
+    for(i=1; i<9; i++)
+    {
+        UART2_Send_char(Uart2_Recv_Buff[i]);
+    }
+    UART2_Send_char(')');
+    return 0;
+}
+
+void Uart2_RTC_Read(void)
+{
+    GetReal_Time();
+    UART2_Send_char('(');
+    UART2_Send_char('R');
+    UART2_Send_char(Now_Year);
+    UART2_Send_char(Now_Mon);
+    UART2_Send_char(Now_Day);
+    UART2_Send_char(Now_Hour);
+    UART2_Send_char(Now_Min);
+    UART2_Send_char(Now_Sec);
+    UART2_Send_char(Now_Week);
+    UART2_Send_char(')');
+}
 //--------------------------------------------
 void Send_char(unsigned char ch)
 {
@@ -143,6 +250,7 @@ void Send_Data(unsigned char *P_data, unsigned int length)
 	RXD1_enable; // 允许接收及其中断
 				 //	BIT_SIO = 0;							// 标志
 }
+
 
 /***********************************************************************/
 unsigned char asc_hex(unsigned char asc) // HEX
@@ -481,3 +589,5 @@ void TranmissionACK(void)
 		TIME_ERROR_Read_once_again=0;
 	}
 }
+
+

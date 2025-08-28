@@ -8,7 +8,7 @@
 #include "uart.h"
 #include "ram.h"
 #include "Pin_define.h"
-#include <iostm8l151g4.h>
+#include <iostm8l151c8.h>
 #include "Timer.h"
 
 typedef unsigned long               *PUINT32;

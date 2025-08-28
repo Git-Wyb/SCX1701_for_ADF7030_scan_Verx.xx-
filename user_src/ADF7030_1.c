@@ -854,7 +854,7 @@ void ReceiveTestModesCFG(void)
  * @Created  : 2017/5/2 by Xiaowine
  * @Brief    : 按键 表单切换
  * @Version  : V1.0
-**/
+**/ /*
 void TestFunV2(u8 KeyVel)
 {
     static u8 StatePoint = 0, PowerdBm = 0, TestState = 0, SendFlag = 0, ACCFlag = 0;
@@ -1017,7 +1017,7 @@ void TestFunV2(u8 KeyVel)
             SendFlag = 0;
         }
     }
-}
+}*/
 /**
  ****************************************************************************
  * @Function : void ADF7030_TX(u8 mode)

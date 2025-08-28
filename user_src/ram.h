@@ -189,6 +189,7 @@ extern u8 Channels;
 extern Basic_Un Status_Un;
 extern Flag_Un StaFlag_Un;
 extern Flag_Un flag1_Un;
+extern Flag_Un flag2_Un;
 extern u8 auto_over_time;
 extern u16 Time_NoCheck_AutoSignal;
 extern u16 Time_Check_AutoSignal;
@@ -220,7 +221,16 @@ extern u16 BASE_TIME_BEEP_off;
 #define flag_rx_done        flag1_Un.FlagByte_bit4
 #define flag_update_his     flag1_Un.FlagByte_bit5
 #define flag_rerx           flag1_Un.FlagByte_bit6
-#define flag_test_rtc       flag1_Un.FlagByte_bit7
+#define flag_test_mode      flag1_Un.FlagByte_bit7
+
+#define flag_uart2_rx       flag2_Un.FlagByte_bit0
+#define flag_sw_f429m       flag2_Un.FlagByte_bit1
+#define flag_sw_tf          flag2_Un.FlagByte_bit2
+#define flag_sw_usb         flag2_Un.FlagByte_bit3
+#define flag_usb_write      flag2_Un.FlagByte_bit4
+#define flag_tf1_in         flag2_Un.FlagByte_bit5
+#define flag_tf2_in         flag2_Un.FlagByte_bit6
+#define flag_sw2_4          flag2_Un.FlagByte_bit7
 
 #define Save_Disable_Beep 0xAA
 
@@ -287,5 +297,11 @@ extern HIS_STU HIS_DATA[BUFFMAX];
 extern u8 His_Num;
 extern u16 His_AddrOffset;
 extern u16 ID_Nums;
+extern u8 Uart2_Recv_Buff[BUFFMAX];
+extern u8 Uart2_Cnt;
+extern u8 Time_SwDetection;
+extern Flag_Un Sw_Un;
+extern u8 flag_usb_state;
+extern u8 test0;
 
 #endif

@@ -81,5 +81,10 @@ void Send_String(unsigned char *string);
 void Send_Data(unsigned char *P_data, unsigned int length);
 void UART1_end(void);
 void PC_PRG(void);
+void UART2_INIT(void);
+void UART2_RX_RXNE(void);
+u8 Uart2_RTC_Write(void);
+void Uart2_RTC_Read(void);
+void UART2_End(void);
 
 #endif

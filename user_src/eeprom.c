@@ -7,7 +7,7 @@
 /*  Mark        :STM8S207C8鐨凜ODE绌洪棿锟�?4K                             */
 /*              :STM8S207C8鐨凟EPROM鐨勫ぇ灏忎负1536瀛楄妭,锟�?3锟�?512锟�?锟�?   */
 /***********************************************************************/
-#include <iostm8l151g4.h> // CPU鍨嬪彿
+#include <iostm8l151c8.h> // CPU鍨嬪彿
 //#include "stm8l15x.h"
 #include "Pin_define.h" // 绠¤剼瀹氫箟
 #include "initial.h"    // 鍒濓拷?锟斤拷?? 棰勫畾锟�?
@@ -742,15 +742,25 @@ void eeprom_write_byte(u16 addr,u8 data)
     LockFlash(UNLOCK_EEPROM_TYPE);
 }
 
-void Read_HisData(u16 padd,u8 rnum)
+void Read_HisData(u16 paddr,u8 rnum)
 {
     u8 i,j;
     for(i=0; i < rnum; i++)
     {
         for(j=0; j<11; j++)
         {
-            HIS_DATA[i].history_buff[j] = ReadByteEEPROM(addr_eeprom_sys + padd);
-            padd++;
+            HIS_DATA[i].history_buff[j] = ReadByteEEPROM(addr_eeprom_sys + paddr);
+            paddr++;
         }
     }
+}
+
+u32 R_ID(u8 *pid)
+{
+    uni_rom_id xid = {0};
+    xid.IDB[1] = pid[0];
+    xid.IDB[2] = pid[1];
+    xid.IDB[3] = pid[2];
+
+    return xid.IDL;
 }

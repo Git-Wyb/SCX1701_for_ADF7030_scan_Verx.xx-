@@ -149,6 +149,8 @@ const u32 PROFILE_CH2_FREQ_32bit_429HighSpeed = 429550000;  //429550000;//429237
 Basic_Un Status_Un = {0};
 Flag_Un StaFlag_Un = {0};
 Flag_Un flag1_Un = {0};
+Flag_Un flag2_Un = {0};
+Flag_Un Sw_Un = {0};
 u8 auto_over_time = 2;  //自动下降时间，默认为10s
 u16 Time_NoCheck_AutoSignal = 0;
 u16 Time_Check_AutoSignal = 0;
@@ -200,4 +202,9 @@ u8 His_Num = 0;
 u16 ID_Nums = 0;
 u16 His_AddrOffset = 0;
 HIS_STU HIS_DATA[BUFFMAX] = {0};
+u8 Uart2_Recv_Buff[BUFFMAX];
+u8 Uart2_Cnt = 0;
+u8 Time_SwDetection = 0;
+u8 flag_usb_state = 0;
+u8 test0 = 0;
 

@@ -6,7 +6,7 @@
 /*  Mark        :ver 1.0                                               */
 /***********************************************************************/
 #include <stdio.h>
-#include <iostm8l151g4.h>
+#include <iostm8l151c8.h>
 //#include        "stm8l15x.h"
 #include "Pin_define.h" // 管脚定义
 #include "initial.h"    // 初始�? 预定�?
@@ -66,11 +66,15 @@ void VHF_GPIO_INIT(void) // CPU端口设置
     PIN_BEEP_direc = Output; // Output   蜂鸣�?
     PIN_BEEP_CR1 = 1;
     PIN_BEEP = 0;
-
+    DIP_SW_Init();
     LED_GPIO_Init();
     ADF7030_GPIO_INIT();
     CG2214M6_GPIO_Init();
     Receiver_OUT_GPIO_Init(); // Output   受信机继电器
+
+    PCF8563_RSTI_DDR = Output;
+    PCF8563_RSTI_CR1 = 1;
+    PCF8563_RSTI = 0;
 }
 //============================================================================================
 void SysClock_Init(void)
@@ -170,9 +174,9 @@ void Receiver_OUT_GPIO_Init(void)
     Receiver_OUT_STOP_CR1 = 1;
     Receiver_OUT_STOP = FG_NOT_allow_out;
 
-    Receiver_OUT_VENT_direc = Output;
-    Receiver_OUT_VENT_CR1 = 1;
-    Receiver_OUT_VENT = FG_NOT_allow_out;
+    //Receiver_OUT_VENT_direc = Output;
+    //Receiver_OUT_VENT_CR1 = 1;
+    //Receiver_OUT_VENT = FG_NOT_allow_out;
 }
 /**
 ****************************************************************************
@@ -196,6 +200,10 @@ void LED_GPIO_Init(void)
     Receiver_LED_RX_direc = Output; // Output   受信机受信指�? 高电平有�?
     Receiver_LED_RX_CR1 = 1;
     Receiver_LED_RX = 0;
+
+    PowerLED_DDR = Output;
+    PowerLED_CR1 = 1;
+    PowerLED = 0;
 }
 /**
 ****************************************************************************
@@ -340,21 +348,21 @@ void OUT_VENT_Init(void)    //????????????????TP3????
 /*拨码开关管脚初始化*/
 void DIP_SW_Init(void)
 {
-     SW_1_DDR = Input;
-     SW_1_CR1 = Pull_up;
-     SW_1_CR2 = InterruptDisable;
+     SW2_1_DDR = Input;
+     SW2_1_CR1 = Pull_up;
+     SW2_1_CR2 = InterruptDisable;
 
-     SW_2_DDR = Input;
-     SW_2_CR1 = Pull_up;
-     SW_2_CR2 = InterruptDisable;
+     SW2_2_DDR = Input;
+     SW2_2_CR1 = Pull_up;
+     SW2_2_CR2 = InterruptDisable;
 
-     SW_3_DDR = Input;
-     SW_3_CR1 = Pull_up;
-     SW_3_CR2 = InterruptDisable;
+     SW2_3_DDR = Input;
+     SW2_3_CR1 = Pull_up;
+     SW2_3_CR2 = InterruptDisable;
 
-     SW_4_DDR = Input;
-     SW_4_CR1 = Pull_up;
-     SW_4_CR2 = InterruptDisable;
+     SW2_4_DDR = Input;
+     SW2_4_CR1 = Pull_up;
+     SW2_4_CR2 = InterruptDisable;
 }
 
 void Input_Signal_Init(void)
@@ -373,6 +381,24 @@ void Input_Signal_Init(void)
      Action_Signal_DDR = Input;
      Action_Signal_CR1 = Pull_up;
      Action_Signal_CR2 = InterruptDisable;
+
+     TF1_INPUT_DDR = Input;
+     TF1_INPUT_CR1 = Pull_up;
+     TF1_INPUT_CR2 = InterruptDisable;
+
+     TF2_INPUT_DDR = Input;
+     TF2_INPUT_CR1 = Pull_up;
+     TF2_INPUT_CR2 = InterruptDisable;
+
+     TF1_POWER_DDR = Output;
+     TF1_POWER_CR1 = 1;
+     TF1_POWER_CR2 = 1;
+     TF1_POWER = 0;
+
+     TF2_POWER_DDR = Output;
+     TF2_POWER_CR1 = 1;
+     TF2_POWER_CR2 = 1;
+     TF2_POWER = 0;
 }
 
 /**
@@ -422,6 +448,7 @@ void RF_BRE_Check(void)
         Receiver_LED_RX = 0;
 }
 void PCF8563_CLKOUT_ON(void);
+UINT8 CH376_USB_Del(void);
 void RF_test_mode(void)
 {
     u8 Flag_TP4 = 0;
@@ -451,12 +478,19 @@ void RF_test_mode(void)
 
     while (Receiver_test == 0)
     {
-       ClearWDT();   // Service the WDT
-       if(flag_test_rtc == 0)
-       {
-           flag_test_rtc = 1;
-           PCF8563_CLKOUT_ON();
-       }
+        ClearWDT();   // Service the WDT
+        if(flag_test_mode == 0)
+        {
+            flag_test_mode = 1;
+            PCF8563_CLKOUT_ON();
+            UART2_INIT();
+        }
+        if(Time_SwDetection == 0)    Dip_Sw_Detection();
+        if(flag_sw_usb == 0 && flag_usb_write == 0)
+        {
+            flag_usb_state = CH376_USB_Del();
+            flag_usb_write = 1;
+        }
         if((TP4 == 0)&&(Flag_TP4==0))   //不使用TP3，因为测试模式TP3与工作模式换气输出有冲突，冲突为三极管导致TP3的高电平只有0.8V
         {
             if (FG_10ms==1)
@@ -553,15 +587,18 @@ void RF_test_mode(void)
             }
         }
         //PC_PRG(); // PC控制
-        //	if((ADF7021_DATA_CLK==1)&&(FG_test_mode==1)&&(FG_test1==0)){
-        //           ADF7021_DATA_tx=!ADF7021_DATA_tx;
-        //           FG_test1=1;
-        //        }
-        //       if(ADF7021_DATA_CLK==0)FG_test1=0;
+        if(flag_uart2_rx)
+        {
+            flag_uart2_rx = 0;
+            if(Uart2_Recv_Buff[1] == 'W') Uart2_RTC_Write();
+            else if (Uart2_Recv_Buff[1] == 'R') Uart2_RTC_Read();
+        }
 
-        if(((Abnormal_Signal == 0) && (Lower_Limit_Signal != 0) && (Action_Signal != 0))
-           || ((Lower_Limit_Signal == 0) && (Abnormal_Signal != 0) && (Action_Signal != 0))
-           || ((Action_Signal == 0) && (Lower_Limit_Signal != 0) && (Abnormal_Signal != 0)))
+        if(((Abnormal_Signal == 0) && (Lower_Limit_Signal != 0) && (Action_Signal != 0) && (flag_tf1_in != 0) && (flag_tf2_in != 0))
+           || ((Lower_Limit_Signal == 0) && (Abnormal_Signal != 0) && (Action_Signal != 0) && (flag_tf1_in != 0) && (flag_tf2_in != 0))
+           || ((Action_Signal == 0) && (Lower_Limit_Signal != 0) && (Abnormal_Signal != 0) && (flag_tf1_in != 0) && (flag_tf2_in != 0))
+           || ((flag_tf1_in == 0) && (Lower_Limit_Signal != 0) && (Abnormal_Signal != 0) && (Action_Signal != 0) && (flag_tf2_in != 0))
+           || ((flag_tf2_in == 0) && (Lower_Limit_Signal != 0) && (Abnormal_Signal != 0) && (Action_Signal != 0) && (flag_tf1_in != 0)))
         {
             if(time_sw == 0)
             {
@@ -633,6 +670,7 @@ void RF_test_mode(void)
             TIME_power_led = 300;
         }*/
     }
+    UART2_End();
     OUT_VENT_Init();
     BerExtiUnInit();
     FG_test_rx = 0;
@@ -646,6 +684,7 @@ void RF_test_mode(void)
     FLAG_APP_RX = 1;
     //TIME_Fine_Calibration = 900;
     //TIME_EMC = 10;
+    flag_test_mode = 0;
 }
 
 
@@ -653,15 +692,76 @@ void RF_test_mode(void)
 u8 DIP_SW_Code(void)
 {
     u8 sw1 = 0,sw2 = 0,sw3 = 0,sw4 = 0;
-    sw1 = SW_1;
-    sw2 = SW_2;
-    sw3 = SW_3;
-    sw4 = SW_4;
+    sw1 = SW2_1;
+    sw2 = SW2_2;
+    sw3 = SW2_3;
+    sw4 = SW2_4;
     return (sw4 << 3 | sw3 << 2 | sw2 << 1 | sw1);
 }
 
+void GetInit_SwState(void)
+{
+    flag_sw_f429m = SW_F429M_IN;
+    flag_sw_tf = SW_TF_IN;
+    flag_sw_usb = SW_USB_IN;
+    flag_tf1_in = TF1_INPUT;
+    flag_tf2_in = TF2_INPUT;
+    flag_sw2_4 = SW2_4;
 
+    Sw_Un.FlagByte_bit0 = flag_sw_f429m;
+    Sw_Un.FlagByte_bit1 = flag_sw_tf;
+    Sw_Un.FlagByte_bit2 = flag_sw_usb;
+    Sw_Un.FlagByte_bit3 = flag_tf1_in;
+    Sw_Un.FlagByte_bit4 = flag_tf2_in;
+    Sw_Un.FlagByte_bit5 = flag_sw2_4;
+}
+Flag_Un sw_un = {0};
+void Dip_Sw_Detection(void)
+{
+    static u8 swcnt = 0;
+    sw_un.FlagByte_bit0 = SW_F429M_IN;
+    sw_un.FlagByte_bit1 = SW_TF_IN;
+    sw_un.FlagByte_bit2 = SW_USB_IN;
+    sw_un.FlagByte_bit3 = TF1_INPUT;
+    sw_un.FlagByte_bit4 = TF2_INPUT;
+    sw_un.FlagByte_bit5 = SW2_4;
 
+    if(Sw_Un.Falg_Byte != sw_un.Falg_Byte)
+    {
+        swcnt++;
+        Time_SwDetection = 20; //200ms
+        if(swcnt >= 3)
+        {
+            swcnt = 0;
+            GetInit_SwState();
+            if(flag_sw_usb == 1) flag_usb_write = 0;
+            if(flag_test_mode == 1)
+            {
+                if(flag_sw_f429m==0 || flag_sw_tf==0 || flag_sw_usb==0 || flag_sw2_4==0)
+                {
+                    UART2_End();
+                    PowerLED = 1;
+                }
+                else
+                    PowerLED = 0;
 
+                if(flag_sw_tf == 0) TF1_POWER = 1;
+                else if(flag_sw_tf == 1) TF1_POWER = 0;
+
+                if(flag_sw2_4 == 0) TF2_POWER = 1;
+                else if(flag_sw2_4 == 1) TF2_POWER = 0;
+            }
+            else
+            {
+                if(flag_sw_tf == 0)  TF2_POWER = 0;
+                else TF2_POWER = 1;
+            }
+        }
+    }
+    else
+    {
+        swcnt = 0;
+    }
+}
 
 

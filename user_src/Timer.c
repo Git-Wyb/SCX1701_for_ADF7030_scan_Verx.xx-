@@ -6,7 +6,7 @@
 /*  DESCRIPTION :                                                      */
 /*  Mark        :ver 1.0                                               */
 /***********************************************************************/
-#include <iostm8l151g4.h> // CPU型号
+#include <iostm8l151c8.h> // CPU型号
 #include "Pin_define.h"   // 管脚定义
 #include "initial.h"      // 初始�? 预定�?
 #include "ram.h"          // RAM定义
@@ -23,7 +23,7 @@ void TIM4_Init(void)
     TIM4_CR1 |= 0x01; // Timer 4 Enable
     TIM4_IER |= 0x01; // Timer 4 OVR interrupt
 }
-
+u16 time_led = 0;
 void TIM4_UPD_OVF(void)
 { //725==1�?
     if (TIMER1s)
@@ -73,6 +73,8 @@ void TIM4_UPD_OVF(void)
             --time_receive_auto;
         if(Time_StateDetection)
             --Time_StateDetection;
+        if(Time_SwDetection)
+            --Time_SwDetection;
         if (TIME_auto_close)
         {
             --TIME_auto_close;
@@ -92,6 +94,57 @@ void TIM4_UPD_OVF(void)
                 sendsta_once();
         }
         if(time_close_auto_beep)    --time_close_auto_beep;
+
+        if(time_led) time_led--;
+        if(flag_usb_state == 1)
+        {
+            if(time_led == 0)
+            {
+                time_led = 20;
+                if(flag_test_mode == 0)
+                {
+                    Receiver_LED_RX = !Receiver_LED_RX;
+                    Receiver_LED_TX = !Receiver_LED_TX;
+                    Receiver_LED_OUT = !Receiver_LED_OUT;
+                    PowerLED = !PowerLED;
+                }
+                else PowerLED = !PowerLED;
+            }
+        }
+        else if(flag_usb_state == 0x55)
+        {
+            time_led = 0;
+            Receiver_LED_RX = 0;
+            Receiver_LED_TX = 0;
+            Receiver_LED_OUT = 0;
+            PowerLED = 0;
+            flag_usb_state = 0xff;
+        }
+        else if(flag_usb_state == 0xFA && time_led == 0)
+        {
+            if(flag_test_mode == 0)
+            {
+                time_led = 500;
+                Receiver_LED_RX = 1;
+                Receiver_LED_TX = 1;
+                Receiver_LED_OUT = 1;
+                PowerLED = 1;
+                flag_usb_state = 2;
+            }
+            else
+            {
+                PowerLED = 0;
+                flag_usb_state = 0xFF;
+            }
+        }
+        if(flag_usb_state == 2 && time_led == 0)
+        {
+            Receiver_LED_RX = 0;
+            Receiver_LED_TX = 0;
+            Receiver_LED_OUT = 0;
+            PowerLED = 0;
+            flag_usb_state = 0xFF;
+        }
     }
     BEEP_function();
     //if (U1AckTimer)

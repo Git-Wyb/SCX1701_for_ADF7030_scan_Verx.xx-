@@ -226,16 +226,12 @@ UINT8 DecimalToBcd(UINT8 bcd)
 void PCF8563_CLKOUT_ON(void)
 {
     Init8563();
-    Write8563(0x01,0);
-    Write8563(0x0e,0);
     Write8563(0x0d,0x80);
 }
 
 void PCF8563_CLKOUT_OFF(void)
 {
     Init8563();
-    Write8563(0x01,0);
-    Write8563(0x0e,0);
     Write8563(0x0d,0x00);
 }
 
@@ -255,6 +251,7 @@ void SetReal_Time(UINT8 yy,UINT8 mm,UINT8 dd,UINT8 hh,UINT8 mi,UINT8 ss,UINT8 ww
     Write8563(0x01,0x02);
     for(i=0; i<7; i++)
     {
+        ClearWDT();
         Write8563(ucAddr,DecimalToBcd(now_time[i]));
         ucAddr++;
     }

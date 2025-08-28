@@ -1,7 +1,7 @@
 /******************** (C) COPYRIGHT  风驰iCreate嵌入式开发工作室 ********************/
 #ifndef __SPI_H__
 #define __SPI_H__
-#include "iostm8l151g4.h"
+#include "iostm8l151c8.h"
 #include "type_def.h"
 
 #define SPI_CS PB_ODR_ODR4     //CS

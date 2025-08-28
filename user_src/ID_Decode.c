@@ -6,7 +6,7 @@
 /*  DESCRIPTION :                                                      */
 /*  Mark        :ver 1.0                                               */
 /***********************************************************************/
-#include <iostm8l151g4.h> // CPU型号
+#include <iostm8l151c8.h> // CPU型号
 #include "Pin_define.h"   // 管脚定义
 #include "initial.h"      // 初�?��?? 预定�?
 #include "ram.h"          // RAM定义
@@ -1576,12 +1576,13 @@ u16 Get_IDNums(void)
 
 u8 CheckID_Type(u32 id)
 {
-    if(11000000 <= id && id < 12000000) return 1;
-    if(13000000 <= id && id < 15000000) return 2;
-    if(15000000 <= id && id < 16000000) return 3;
-    if( 2000000 <= id && id <  3000000) return 4;
-    if( 3000000 <= id && id <  4000000) return 5;
-    if( 4000000 <= id && id <  5000000) return 6;
-    if(15100000 <= id && id < 15200000) return 7;
-    return 0;
+    if(11000000 <= id && id < 12000000) return 0;
+    if(13000000 <= id && id < 15000000) return 1;
+    if(15000000 <= id && id < 16000000) return 2;
+    if( 2000000 <= id && id <  3000000) return 3;
+    if( 3000000 <= id && id <  4000000) return 4;
+    if( 4000000 <= id && id <  5000000) return 5;
+    if(15100000 <= id && id < 15200000) return 6;
+    return 1;
 }
+

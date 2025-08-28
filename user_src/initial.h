@@ -63,5 +63,7 @@ void DIP_SW_Init(void);
 u8 DIP_SW_Code(void);
 void DIP_SW_Test(void);
 void Input_Signal_Init(void);
+void Dip_Sw_Detection(void);
+void GetInit_SwState(void);
 
 #endif

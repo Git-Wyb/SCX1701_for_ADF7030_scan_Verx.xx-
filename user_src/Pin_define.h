@@ -129,14 +129,14 @@
 // #define HA_Sensor_signal_CR2 PA_CR2_C23
 
 /**WORK/TEST切换引脚寄存器*****/
-#define WORK_TEST PC_IDR_IDR0//PB_IDR_IDR0     // Input 受信机测试脚  高电平有效
-#define WORK_TEST_DDR PC_DDR_DDR0//PB_DDR_DDR0 // Input 受信机测试脚  高电平有效
-#define WORK_TEST_CR1 PC_CR1_C10//PB_CR1_C10  // Input 受信机测试脚  高电平有效
-#define WORK_TEST_CR2 PC_CR2_C20//PB_CR2_C20  // Input 受信机测试脚  高电平有效
+#define WORK_TEST PE_IDR_IDR5 //PC_IDR_IDR0//PB_IDR_IDR0     // Input 受信机测试脚  高电平有效
+#define WORK_TEST_DDR PE_DDR_DDR5 //PC_DDR_DDR0//PB_DDR_DDR0 // Input 受信机测试脚  高电平有效
+#define WORK_TEST_CR1 PE_CR1_C15//PC_CR1_C10//PB_CR1_C10  // Input 受信机测试脚  高电平有效
+#define WORK_TEST_CR2 PE_CR2_C25//PC_CR2_C20//PB_CR2_C20  // Input 受信机测试脚  高电平有效
 
-#define Receiver_test PC_IDR_IDR0//PB_IDR_IDR0       // Input 受信机测试脚  高电平有效
-#define Receiver_test_direc PC_DDR_DDR0//PB_DDR_DDR0 // Input 受信机测试脚  高电平有效
-#define Receiver_test_CR1 PC_CR1_C10 //PB_CR1_C10    // Input 受信机测试脚  高电平有效
+#define Receiver_test PE_IDR_IDR5 //PC_IDR_IDR0//PB_IDR_IDR0       // Input 受信机测试脚  高电平有效
+#define Receiver_test_direc PE_DDR_DDR5 //PC_DDR_DDR0//PB_DDR_DDR0 // Input 受信机测试脚  高电平有效
+#define Receiver_test_CR1 PE_CR1_C15 //PC_CR1_C10 //PB_CR1_C10    // Input 受信机测试脚  高电平有效
 
 /*
 #define TP3 PA_IDR_IDR4
@@ -145,10 +145,10 @@
 #define TP3_CR2 PA_CR2_C24
 */
 
-#define TP4     PC_IDR_IDR1 //PA_IDR_IDR5
-#define TP4_DDR PC_DDR_DDR1 //PA_DDR_DDR5
-#define TP4_CR1 PC_CR1_C11  //PA_CR1_C15
-#define TP4_CR2 PC_CR2_C21  //PA_CR2_C25
+#define TP4     PA_IDR_IDR2 //PC_IDR_IDR1 //PA_IDR_IDR5
+#define TP4_DDR PA_DDR_DDR2 //PC_DDR_DDR1 //PA_DDR_DDR5
+#define TP4_CR1 PA_CR1_C12 //PC_CR1_C11  //PA_CR1_C15
+#define TP4_CR2 PA_CR2_C22 //PC_CR2_C21  //PA_CR2_C25
 
 /******************以下是data寄存器************************************/
 #define Receiver_vent   1 //Receiver_vent_Cache       // Input   受信机换气联动ON/OFF
@@ -171,9 +171,9 @@
 #define Receiver_OUT_STOP_direc PD_DDR_DDR1 // Output   受信机继电器stop  高电平有效
 #define Receiver_OUT_STOP_CR1 PD_CR1_C11    // Output   受信机继电器stop  高电平有效
 
-#define Receiver_OUT_VENT PA_ODR_ODR4       // Output   受信机继电器VENT  高电平有效
-#define Receiver_OUT_VENT_direc PA_DDR_DDR4 // Output 受信机继电器VENT  高电平有效
-#define Receiver_OUT_VENT_CR1 PA_CR1_C14    // Output 受信机继电器VENT  高电平有效
+#define Receiver_OUT_VENT   test0//PA_ODR_ODR4       // Output   受信机继电器VENT  高电平有效
+#define Receiver_OUT_VENT_direc  test0//PA_DDR_DDR4 // Output 受信机继电器VENT  高电平有效
+#define Receiver_OUT_VENT_CR1  test0//PA_CR1_C14    // Output 受信机继电器VENT  高电平有效
 
 
 // #define Inverters_OUT PA_IDR_IDR2       // 输入   继电器输出信号反向   低电平有效
@@ -181,27 +181,32 @@
 // #define Inverters_OUT_CR1 PA_CR1_C12    // 输入   继电器输出信号反向   低电平有效
 
 
-/* 拨码开关 <自动选择器从关闭到关闭信号的时间设置功能> */
-#define SW_1_DDR PE_DDR_DDR2
-#define SW_1_CR1 PE_CR1_C12
-#define SW_1_CR2 PE_CR2_C22
+/* 拨码开关 */
+#define SW2_1_DDR PE_DDR_DDR7
+#define SW2_1_CR1 PE_CR1_C17
+#define SW2_1_CR2 PE_CR2_C27
 
-#define SW_2_DDR PE_DDR_DDR3
-#define SW_2_CR1 PE_CR1_C13
-#define SW_2_CR2 PE_CR2_C23
+#define SW2_2_DDR PA_DDR_DDR6
+#define SW2_2_CR1 PA_CR1_C16
+#define SW2_2_CR2 PA_CR2_C26
 
-#define SW_3_DDR PE_DDR_DDR4
-#define SW_3_CR1 PE_CR1_C14
-#define SW_3_CR2 PE_CR2_C24
+#define SW2_3_DDR PA_DDR_DDR7
+#define SW2_3_CR1 PA_CR1_C17
+#define SW2_3_CR2 PA_CR2_C27
 
-#define SW_4_DDR PE_DDR_DDR5
-#define SW_4_CR1 PE_CR1_C15
-#define SW_4_CR2 PE_CR2_C25
+#define SW2_4_DDR PA_DDR_DDR4  //备用
+#define SW2_4_CR1 PA_CR1_C14
+#define SW2_4_CR2 PA_CR2_C24
 
-#define SW_1   PE_IDR_IDR2
-#define SW_2   PE_IDR_IDR3
-#define SW_3   PE_IDR_IDR4
-#define SW_4   PE_IDR_IDR5
+#define SW2_1   PE_IDR_IDR7
+#define SW2_2   PA_IDR_IDR6
+#define SW2_3   PA_IDR_IDR7
+#define SW2_4   PA_IDR_IDR4  //备用
+
+#define SW_F429M_IN  SW2_1
+#define SW_TF_IN     SW2_2
+#define SW_USB_IN    SW2_3
+
 //开关编码
 #define SW_CODE_0   0x0F   /* 10s */
 #define SW_CODE_1   0x0E   /* 20s */
@@ -230,6 +235,27 @@
 #define Action_Signal_CR2       PE_CR2_C22
 #define Action_Signal           PE_IDR_IDR2     //动作中信号，为0表示动作信号
 
+#define TF1_POWER_DDR           PD_DDR_DDR7
+#define TF1_POWER_CR1           PD_CR1_C17
+#define TF1_POWER_CR2           PD_CR2_C27
+#define TF1_POWER               PD_ODR_ODR7
+
+#define TF2_POWER_DDR           PD_DDR_DDR5
+#define TF2_POWER_CR1           PD_CR1_C15
+#define TF2_POWER_CR2           PD_CR2_C25
+#define TF2_POWER               PD_ODR_ODR5
+
+#define TF1_INPUT_DDR           PD_DDR_DDR6
+#define TF1_INPUT_CR1           PD_CR1_C16
+#define TF1_INPUT_CR2           PD_CR2_C26
+#define TF1_INPUT               PD_IDR_IDR6
+
+#define TF2_INPUT_DDR           PF_DDR_DDR0
+#define TF2_INPUT_CR1           PF_CR1_C10
+#define TF2_INPUT_CR2           PF_CR2_C20
+#define TF2_INPUT               PF_IDR_IDR0
+
+
 #define PIN_PCF8563_SDAOUT      PC_ODR_ODR0
 #define PIN_PCF8563_SDAIN       PC_IDR_IDR0
 #define PIN_PCF8563_SCL         PC_ODR_ODR1
@@ -238,13 +264,16 @@
 #define PIN_PCF8563_SCL_direc   PC_DDR_DDR1
 #define PIN_PCF8563_SDA_CR1     PC_CR1_C10
 #define PIN_PCF8563_SCL_CR1     PC_CR1_C11
-/*
-//测试调试用
-#define Action_Signal_DDR       PC_DDR_DDR1
-#define Action_Signal_CR1       PC_CR1_C11
-#define Action_Signal_CR2       PC_CR2_C21
-#define Action_Signal           PC_IDR_IDR1     //动作中信号，为0表示动作信号 */
 
+#define PCF8563_RSTI_DDR        PE_DDR_DDR6
+#define PCF8563_RSTI_CR1        PE_CR1_C16
+#define PCF8563_RSTI_CR2        PE_CR2_C26
+#define PCF8563_RSTI            PE_ODR_ODR6
+
+#define PowerLED_DDR     PE_DDR_DDR4
+#define PowerLED_CR1     PE_CR1_C14
+#define PowerLED_CR2     PE_CR2_C24
+#define PowerLED         PE_ODR_ODR4
 
 /* 自动下降时间设定 */
 #define CLOSE_AUTO_DECLINE  0x90  //不执行自动下降
