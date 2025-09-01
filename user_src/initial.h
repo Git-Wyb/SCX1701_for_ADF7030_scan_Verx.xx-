@@ -65,5 +65,9 @@ void DIP_SW_Test(void);
 void Input_Signal_Init(void);
 void Dip_Sw_Detection(void);
 void GetInit_SwState(void);
+void TF1_Detection(void);
+void TF2_Detection(void);
+void SwTf_Input_Detection(void);
+void GetInit_TFState(void);
 
 #endif

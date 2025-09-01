@@ -190,6 +190,7 @@ extern Basic_Un Status_Un;
 extern Flag_Un StaFlag_Un;
 extern Flag_Un flag1_Un;
 extern Flag_Un flag2_Un;
+extern Flag_Un flag3_Un;
 extern u8 auto_over_time;
 extern u16 Time_NoCheck_AutoSignal;
 extern u16 Time_Check_AutoSignal;
@@ -231,6 +232,13 @@ extern u16 BASE_TIME_BEEP_off;
 #define flag_tf1_in         flag2_Un.FlagByte_bit5
 #define flag_tf2_in         flag2_Un.FlagByte_bit6
 #define flag_sw2_4          flag2_Un.FlagByte_bit7
+
+#define flag_tf1_now        flag3_Un.FlagByte_bit0
+#define flag_tf2_now        flag3_Un.FlagByte_bit1
+#define flag_tf1_befor      flag3_Un.FlagByte_bit2
+#define flag_tf2_befor      flag3_Un.FlagByte_bit3
+#define flag_tf1            flag3_Un.FlagByte_bit4
+#define flag_tf2            flag3_Un.FlagByte_bit5
 
 #define Save_Disable_Beep 0xAA
 
@@ -303,5 +311,9 @@ extern u8 Time_SwDetection;
 extern Flag_Un Sw_Un;
 extern u8 flag_usb_state;
 extern u8 test0;
+extern u16 Time_TF1;
+extern u16 Time_TF2;
+extern u8 time_tf1_Detection;
+extern u8 time_tf2_Detection;
 
 #endif

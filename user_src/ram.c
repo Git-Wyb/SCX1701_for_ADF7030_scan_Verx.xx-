@@ -150,6 +150,7 @@ Basic_Un Status_Un = {0};
 Flag_Un StaFlag_Un = {0};
 Flag_Un flag1_Un = {0};
 Flag_Un flag2_Un = {0};
+Flag_Un flag3_Un = {0};
 Flag_Un Sw_Un = {0};
 u8 auto_over_time = 2;  //自动下降时间，默认为10s
 u16 Time_NoCheck_AutoSignal = 0;
@@ -193,7 +194,7 @@ u8 ERROR_Read_sendTX_packet=0;
 u8 Flag_ERROR_Read_once_again=0;
 u8 uart_rx_data = 0;
 u8 FLAG_RTC_RTC = 0;
-unsigned char g8563_Store[7]={0x00,0x59,0x07,0x01,0x01,0x01,0x14}; /*时间交换区,全局变量声明*/
+unsigned char g8563_Store[7]={0,0,0,1,1,1,1};//0x00,0x59,0x07,0x01,0x01,0x01,0x14}; /*时间交换区,全局变量声明*/
 u8 FLAG_CLOCK = 0;
 STRUCT_DATE History_STU = {0};
 u8 his_buff[BUFFMAX * 11] = {0};
@@ -206,5 +207,9 @@ u8 Uart2_Recv_Buff[BUFFMAX];
 u8 Uart2_Cnt = 0;
 u8 Time_SwDetection = 0;
 u8 flag_usb_state = 0;
+u8 time_tf1_Detection = 0;
+u8 time_tf2_Detection = 0;
+u16 Time_TF1 = 0;
+u16 Time_TF2 = 0;
 u8 test0 = 0;
 

@@ -454,27 +454,8 @@ void RF_test_mode(void)
     u8 Flag_TP4 = 0;
     u8 test_time_Base10ms = 0;
     u8 Tx_Rx_mode = 0;
-
-    //u8 flag_odd_num = 0;
-    //u8 flag_even_num = 0;
-    //u8 sum_num = 0;
     u8 i=0;
-    //static u8 code_x = SW_CODE_0;
-
-    //UINT8 Boot_i;
-	 Receiver_LED_OUT = 1;
-	 /*for (Boot_i = 0; Boot_i < 4; Boot_i++)
-	 {
-		 for (time_3sec = 0; time_3sec < 6000; time_3sec++)
-		 {
-			 Delayus(250); //80us
-			 ClearWDT();   // Service the WDT
-						   // Send_char(0x05);
-		 }
-		 Receiver_LED_OUT = !Receiver_LED_OUT;
-	 }
-    Receiver_LED_OUT = 0; */
-
+	Receiver_LED_OUT = 1;
 
     while (Receiver_test == 0)
     {
@@ -486,6 +467,8 @@ void RF_test_mode(void)
             UART2_INIT();
         }
         if(Time_SwDetection == 0)    Dip_Sw_Detection();
+        flag_tf1_now = TF1_INPUT;
+        flag_tf2_now = TF2_INPUT;
         if(flag_sw_usb == 0 && flag_usb_write == 0)
         {
             flag_usb_state = CH376_USB_Del();
@@ -594,11 +577,11 @@ void RF_test_mode(void)
             else if (Uart2_Recv_Buff[1] == 'R') Uart2_RTC_Read();
         }
 
-        if(((Abnormal_Signal == 0) && (Lower_Limit_Signal != 0) && (Action_Signal != 0) && (flag_tf1_in != 0) && (flag_tf2_in != 0))
-           || ((Lower_Limit_Signal == 0) && (Abnormal_Signal != 0) && (Action_Signal != 0) && (flag_tf1_in != 0) && (flag_tf2_in != 0))
-           || ((Action_Signal == 0) && (Lower_Limit_Signal != 0) && (Abnormal_Signal != 0) && (flag_tf1_in != 0) && (flag_tf2_in != 0))
-           || ((flag_tf1_in == 0) && (Lower_Limit_Signal != 0) && (Abnormal_Signal != 0) && (Action_Signal != 0) && (flag_tf2_in != 0))
-           || ((flag_tf2_in == 0) && (Lower_Limit_Signal != 0) && (Abnormal_Signal != 0) && (Action_Signal != 0) && (flag_tf1_in != 0)))
+        if(((Abnormal_Signal == 0) && (Lower_Limit_Signal != 0) && (Action_Signal != 0) && (flag_tf1_now != 0) && (flag_tf2_now != 0))
+           || ((Lower_Limit_Signal == 0) && (Abnormal_Signal != 0) && (Action_Signal != 0) && (flag_tf1_now != 0) && (flag_tf2_now != 0))
+           || ((Action_Signal == 0) && (Lower_Limit_Signal != 0) && (Abnormal_Signal != 0) && (flag_tf1_now != 0) && (flag_tf2_now != 0))
+           || ((flag_tf1_now == 0) && (Lower_Limit_Signal != 0) && (Abnormal_Signal != 0) && (Action_Signal != 0) && (flag_tf2_now != 0))
+           || ((flag_tf2_now == 0) && (Lower_Limit_Signal != 0) && (Abnormal_Signal != 0) && (Action_Signal != 0) && (flag_tf1_now != 0)))
         {
             if(time_sw == 0)
             {
@@ -612,7 +595,7 @@ void RF_test_mode(void)
             }
             i = 0;
         }
-        else if(Abnormal_Signal == 0 || Lower_Limit_Signal == 0 || Action_Signal == 0)
+        else if(Abnormal_Signal == 0 || Lower_Limit_Signal == 0 || Action_Signal == 0 || flag_tf1_now == 0 || flag_tf2_now == 0)
         {
              Receiver_LED_OUT = 1;
              i = 1;
@@ -671,6 +654,7 @@ void RF_test_mode(void)
         }*/
     }
     UART2_End();
+    PowerLED = 1;
     OUT_VENT_Init();
     BerExtiUnInit();
     FG_test_rx = 0;
@@ -704,27 +688,22 @@ void GetInit_SwState(void)
     flag_sw_f429m = SW_F429M_IN;
     flag_sw_tf = SW_TF_IN;
     flag_sw_usb = SW_USB_IN;
-    flag_tf1_in = TF1_INPUT;
-    flag_tf2_in = TF2_INPUT;
     flag_sw2_4 = SW2_4;
 
     Sw_Un.FlagByte_bit0 = flag_sw_f429m;
     Sw_Un.FlagByte_bit1 = flag_sw_tf;
     Sw_Un.FlagByte_bit2 = flag_sw_usb;
-    Sw_Un.FlagByte_bit3 = flag_tf1_in;
-    Sw_Un.FlagByte_bit4 = flag_tf2_in;
-    Sw_Un.FlagByte_bit5 = flag_sw2_4;
+    Sw_Un.FlagByte_bit3 = flag_sw2_4;
 }
-Flag_Un sw_un = {0};
+
 void Dip_Sw_Detection(void)
 {
+    Flag_Un sw_un = {0};
     static u8 swcnt = 0;
     sw_un.FlagByte_bit0 = SW_F429M_IN;
     sw_un.FlagByte_bit1 = SW_TF_IN;
     sw_un.FlagByte_bit2 = SW_USB_IN;
-    sw_un.FlagByte_bit3 = TF1_INPUT;
-    sw_un.FlagByte_bit4 = TF2_INPUT;
-    sw_un.FlagByte_bit5 = SW2_4;
+    sw_un.FlagByte_bit3 = SW2_4;
 
     if(Sw_Un.Falg_Byte != sw_un.Falg_Byte)
     {
@@ -735,7 +714,7 @@ void Dip_Sw_Detection(void)
             swcnt = 0;
             GetInit_SwState();
             if(flag_sw_usb == 1) flag_usb_write = 0;
-            if(flag_test_mode == 1)
+            if(flag_test_mode == 1)   //test mode
             {
                 if(flag_sw_f429m==0 || flag_sw_tf==0 || flag_sw_usb==0 || flag_sw2_4==0)
                 {
@@ -746,14 +725,14 @@ void Dip_Sw_Detection(void)
                     PowerLED = 0;
 
                 if(flag_sw_tf == 0) TF1_POWER = 1;
-                else if(flag_sw_tf == 1) TF1_POWER = 0;
+                else TF1_POWER = 0;
 
                 if(flag_sw2_4 == 0) TF2_POWER = 1;
-                else if(flag_sw2_4 == 1) TF2_POWER = 0;
+                else TF2_POWER = 0;
             }
-            else
+            else  //work mode
             {
-                if(flag_sw_tf == 0)  TF2_POWER = 0;
+                if(flag_sw_tf == 0)  {TF2_POWER = 0; flag_tf2 = 0;}
                 else TF2_POWER = 1;
             }
         }
@@ -764,4 +743,152 @@ void Dip_Sw_Detection(void)
     }
 }
 
+void GetInit_TFState(void)
+{
+    TF1_POWER = 1;
+    if(flag_sw_tf == 0)  TF2_POWER = 0;
+    else TF2_POWER = 1;
+    mDelaymS( 200 );
 
+    flag_tf1_befor = TF1_INPUT;
+    flag_tf2_befor = TF2_INPUT;
+
+    if(flag_tf1_befor == 0)
+    {
+        Time_TF1 = 200;
+        flag_tf1_in = 1;
+    }
+    else
+    {
+        Time_TF1 = 0;
+        flag_tf1_in = 0;
+        flag_tf1 = 0;
+    }
+
+    if(flag_sw_tf == 0)
+    {
+        Time_TF2 = 0;
+        flag_tf2_in = 0;
+        flag_tf2 = 0;
+    }
+    else
+    {
+        if(flag_tf2_befor == 0)
+        {
+            Time_TF2 = 200;
+            flag_tf2_in = 1;
+        }
+        else
+        {
+            Time_TF2 = 0;
+            flag_tf2_in = 0;
+            flag_tf2 = 0;
+        }
+    }
+}
+
+void TF1_Detection(void)
+{
+    static u8 tf1_cnt = 0;
+
+    flag_tf1_now = TF1_INPUT;
+    if(flag_tf1_now != flag_tf1_befor)
+    {
+        tf1_cnt++;
+        time_tf1_Detection = 20; //200ms
+        if(tf1_cnt > 3)
+        {
+            tf1_cnt = 0;
+            flag_tf1_befor = TF1_INPUT;
+            flag_tf1_now   = TF1_INPUT;
+            if(flag_tf1_now == 0)
+            {
+                Time_TF1 = 200;
+                flag_tf1_in = 1;
+            }
+            else if(flag_tf1 == 0)
+            {
+                Time_TF1 = 0;
+                flag_tf1_in = 0;
+            }
+            else
+            {
+                Time_TF1 = 1000; //10s
+                flag_tf1_in = 0;
+            }
+        }
+    }
+    else
+    {
+        tf1_cnt = 0;
+    }
+    if(flag_tf1_in == 1 && Time_TF1 == 0)
+    {
+        flag_tf1 = 1;
+    }
+    else if(flag_tf1_in == 0 && Time_TF1 == 0)
+    {
+        flag_tf1 = 0;
+    }
+}
+
+void TF2_Detection(void)
+{
+    static u8 tf2_cnt = 0;
+
+    flag_tf2_now = TF2_INPUT;
+    if(flag_tf2_now != flag_tf2_befor)
+    {
+        tf2_cnt++;
+        time_tf2_Detection = 20; //200ms
+        if(tf2_cnt > 3)
+        {
+            tf2_cnt = 0;
+            flag_tf2_befor = TF2_INPUT;
+            flag_tf2_now   = TF2_INPUT;
+            if(flag_tf2_now == 0)
+            {
+                Time_TF2 = 200;
+                flag_tf2_in = 1;
+            }
+            else if(flag_tf2 == 0)
+            {
+                Time_TF2 = 0;
+                flag_tf2_in = 0;
+            }
+            else
+            {
+                Time_TF2 = 1000; //10s
+                flag_tf2_in = 0;
+            }
+        }
+    }
+    else
+    {
+        tf2_cnt = 0;
+    }
+    if(flag_tf2_in == 1 && Time_TF2 == 0)
+    {
+        flag_tf2 = 1;
+    }
+    else if(flag_tf2_in == 0 && Time_TF2 == 0)
+    {
+        flag_tf2 = 0;
+    }
+}
+
+void SwTf_Input_Detection(void)
+{
+    if(Time_SwDetection == 0)   Dip_Sw_Detection();
+    if(time_tf1_Detection == 0) TF1_Detection();
+    if(flag_sw_tf == 0)
+    {
+        flag_tf2 = 0;
+        Time_TF2 = 0;
+        flag_tf2_in = 0;
+    }
+    else
+    {
+        if(time_tf2_Detection == 0) TF2_Detection();
+    }
+}

@@ -81,7 +81,7 @@ void main(void)
     GetInitial_State();
     Status_Un.Receive_SignalType = 1;
     APP429M_Tx_State(); //上电发送一次状态
-    TF1_POWER = 1;
+    GetInit_TFState();
     while (1)
     {
         ClearWDT(); // Service the WDT
@@ -91,10 +91,11 @@ void main(void)
         if (time_Login_exit_256 == 0)
             ID_Decode_OUT();
         ID_learn();
-        if((ID_SCX1801_DATA != 0) && Receiver_429MHz_mode == 0 && Status_Un.Exist_ID != 1)//有ID登录且不是万能码遥控就发送状态
+        if((ID_SCX1801_DATA != 0) && Receiver_429MHz_mode == 0 && Status_Un.Exist_ID != 1 && flag_sw_f429m == 1)//有ID登录且不是万能码遥控就发送状态
         {
             APP_TX_PACKET();
         }
+        else app_tx_en = 0;
         //接收到特殊ID并且有ID登录或者接收到429MHz开闭指令有动作就启动蜂鸣器
         if((Status_Un.Exist_ID == 1))
         {
@@ -129,12 +130,17 @@ void main(void)
         {
             Beep_Action_On();
         }
-        if(ID_SCX1801_DATA == 0 || flag_sw_f429m == 0)    app_tx_en = 0;
-        if(Time_SwDetection == 0)   Dip_Sw_Detection();
+
+        SwTf_Input_Detection();
         if(flag_sw_usb == 0 && flag_usb_write == 0)
         {
-            flag_usb_state = CH376_USB_Del();
             flag_usb_write = 1;
+            TF1_POWER = 0;
+            TF2_POWER = 0;
+            flag_usb_state = CH376_USB_Del();
+            TF1_POWER = 1;
+            if(flag_sw_tf == 0)  TF2_POWER = 0;
+            else TF2_POWER = 1;
         }
     }
 }

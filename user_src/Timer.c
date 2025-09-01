@@ -94,7 +94,10 @@ void TIM4_UPD_OVF(void)
                 sendsta_once();
         }
         if(time_close_auto_beep)    --time_close_auto_beep;
-
+        if(Time_TF1) Time_TF1--;
+        if(Time_TF2) Time_TF2--;
+        if(time_tf1_Detection) time_tf1_Detection--;
+        if(time_tf2_Detection) time_tf2_Detection--;
         if(time_led) time_led--;
         if(flag_usb_state == 1)
         {
@@ -114,11 +117,15 @@ void TIM4_UPD_OVF(void)
         else if(flag_usb_state == 0x55)
         {
             time_led = 0;
-            Receiver_LED_RX = 0;
-            Receiver_LED_TX = 0;
-            Receiver_LED_OUT = 0;
-            PowerLED = 0;
-            flag_usb_state = 0xff;
+            if(flag_test_mode == 0)
+            {
+                Receiver_LED_RX = 0;
+                Receiver_LED_TX = 0;
+                Receiver_LED_OUT = 0;
+                PowerLED = 1;
+            }
+            else PowerLED = 0;
+            flag_usb_state = 0xFF;
         }
         else if(flag_usb_state == 0xFA && time_led == 0)
         {
@@ -129,20 +136,26 @@ void TIM4_UPD_OVF(void)
                 Receiver_LED_TX = 1;
                 Receiver_LED_OUT = 1;
                 PowerLED = 1;
+                BEEP_Module(300,1);
                 flag_usb_state = 2;
             }
             else
             {
-                PowerLED = 0;
+                PowerLED = 1;
                 flag_usb_state = 0xFF;
             }
         }
         if(flag_usb_state == 2 && time_led == 0)
         {
-            Receiver_LED_RX = 0;
-            Receiver_LED_TX = 0;
-            Receiver_LED_OUT = 0;
-            PowerLED = 0;
+            if(flag_test_mode == 0)
+            {
+                Receiver_LED_RX = 0;
+                Receiver_LED_TX = 0;
+                Receiver_LED_OUT = 0;
+                PowerLED = 1;
+                Tone_OFF();
+            }
+            else PowerLED = 0;
             flag_usb_state = 0xFF;
         }
     }

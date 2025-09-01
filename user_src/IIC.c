@@ -152,7 +152,7 @@ void Rewrite8563(void)
 void Init8563(void)
  {
    /*秒、  分  、时、日期、星期、月、年 */
-    unsigned char c8563_Store[7]={0x00,0x00,0x00,0x24,0x05,0x10,0x14}; /*写入时间初值：星期一 07:59:00*/
+    unsigned char c8563_Store[7]={0,0,0,1,1,1,1}; /*写入时间初值：01年1月1日，星期一 00:00:00*/
     IIC_INIT();
     uchar i,ucAddr=0x02,Tp_data;
     FLAG_RTC_RTC = 1;//这个不重入
@@ -166,7 +166,7 @@ void Init8563(void)
 
         for(i=0;i<7;i++)
         {
-        Write8563(ucAddr,c8563_Store[i]);
+        Write8563(ucAddr,DecimalToBcd(c8563_Store[i]));
         ucAddr++;
         }
         FLAG_RTC_RTC = 0;

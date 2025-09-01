@@ -1059,9 +1059,12 @@ void ID_Decode_OUT(void)
         if ((FG_auto_out == 1) && (TIME_auto_out == 0))
         {
             FG_auto_out = 0;
-            TIME_auto_close = 270;
-            Receiver_LED_OUT = 1;
-            if(Allow_BeepOn_Flag == 1)  _ReqBuzzer(144,1,1); //短音第三次
+            if(flag_tf1 == 0)
+            {
+                TIME_auto_close = 270;
+                Receiver_LED_OUT = 1;
+                if(Allow_BeepOn_Flag == 1)  _ReqBuzzer(144,1,1); //短音第三次
+            }
         } //300
         if (TIME_auto_close)
         {
