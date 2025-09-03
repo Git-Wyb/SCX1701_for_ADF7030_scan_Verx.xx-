@@ -37,5 +37,6 @@ void Hisdata_Inbuff(u8 *baddr,STRUCT_DATE *pdata);
 void Save_OperationHistory(u16 paddr,HIS_STU *pdata,u8 datanum);
 u16 Get_IDNums(void);
 u8 CheckID_Type(u32 id);
+void Login_RssiSet_Init(void);
 
 #endif

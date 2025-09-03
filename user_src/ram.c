@@ -151,6 +151,7 @@ Flag_Un StaFlag_Un = {0};
 Flag_Un flag1_Un = {0};
 Flag_Un flag2_Un = {0};
 Flag_Un flag3_Un = {0};
+Flag_Un flag4_Un = {0};
 Flag_Un Sw_Un = {0};
 u8 auto_over_time = 2;  //自动下降时间，默认为10s
 u16 Time_NoCheck_AutoSignal = 0;
@@ -212,4 +213,4 @@ u8 time_tf2_Detection = 0;
 u16 Time_TF1 = 0;
 u16 Time_TF2 = 0;
 u8 test0 = 0;
-
+u8 RSSI_SET_VAL = 50;

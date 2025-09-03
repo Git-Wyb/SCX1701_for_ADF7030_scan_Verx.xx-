@@ -93,7 +93,7 @@ void ID_Decode_IDCheck(void)
                         rrss=RAM_RSSI_AVG/128;
                         rrss=-rrss;
                         if(rrss>=127)rrss=127;
-                        if(rrss <= 50)
+                        if(rrss <= RSSI_SET_VAL)
                         {
                             FLAG_ID_Login_OK = 1;
                             ID_Receiver_Login = DATA_Packet_ID;
@@ -407,6 +407,11 @@ void eeprom_IDcheck(void)
 			//Struct_DATA_Packet_Contro=Struct_DATA_Packet_Contro_buf;
             DATA_Packet_Control = DATA_Packet_Contro_buf;
 		}
+        else if((PROFILE_CH_FREQ_32bit_200002EC == PROFILE_LOGIN_RSSISET_FREQ) && DATA_Packet_ID == 12345678)
+        {
+            FLAG_IDCheck_OK = 1;
+            DATA_Packet_Control = DATA_Packet_Contro_buf;
+        }
 #else
 			for (i = 0; i < ID_DATA_PCS; i++)
 			{
@@ -993,6 +998,116 @@ void ID_Decode_OUT(void)
                         app_tx_en = 1;
                     }
                 break;
+
+                case RSSI_SET_10:
+                    if(flag_sw2_4 == 0)
+                    {
+                        RSSI_SET_VAL = 10;
+                        flag_rssi_set = 1;
+                        Struct_DATA_Packet_Contro_fno = RSSI_SET_10;
+                        flag_rssiset_txen = 1;
+                    }
+                    break;
+                case RSSI_SET_20:
+                    if(flag_sw2_4 == 0)
+                    {
+                        RSSI_SET_VAL = 20;
+                        flag_rssi_set = 1;
+                        Struct_DATA_Packet_Contro_fno = RSSI_SET_20;
+                        flag_rssiset_txen = 1;
+                    }
+                    break;
+                case RSSI_SET_30:
+                    if(flag_sw2_4 == 0)
+                    {
+                        RSSI_SET_VAL = 30;
+                        flag_rssi_set = 1;
+                        Struct_DATA_Packet_Contro_fno = RSSI_SET_30;
+                        flag_rssiset_txen = 1;
+                    }
+                    break;
+                case RSSI_SET_40:
+                    if(flag_sw2_4 == 0)
+                    {
+                        RSSI_SET_VAL = 40;
+                        flag_rssi_set = 1;
+                        Struct_DATA_Packet_Contro_fno = RSSI_SET_40;
+                        flag_rssiset_txen = 1;
+                    }
+                    break;
+                case RSSI_SET_50:
+                    if(flag_sw2_4 == 0)
+                    {
+                        RSSI_SET_VAL = 50;
+                        flag_rssi_set = 1;
+                        Struct_DATA_Packet_Contro_fno = RSSI_SET_50;
+                        flag_rssiset_txen = 1;
+                    }
+                    break;
+                case RSSI_SET_60:
+                    if(flag_sw2_4 == 0)
+                    {
+                        RSSI_SET_VAL = 60;
+                        flag_rssi_set = 1;
+                        Struct_DATA_Packet_Contro_fno = RSSI_SET_60;
+                        flag_rssiset_txen = 1;
+                    }
+                    break;
+                case RSSI_SET_70:
+                    if(flag_sw2_4 == 0)
+                    {
+                        RSSI_SET_VAL = 70;
+                        flag_rssi_set = 1;
+                        Struct_DATA_Packet_Contro_fno = RSSI_SET_70;
+                        flag_rssiset_txen = 1;
+                    }
+                    break;
+                case RSSI_SET_80:
+                    if(flag_sw2_4 == 0)
+                    {
+                        RSSI_SET_VAL = 80;
+                        flag_rssi_set = 1;
+                        Struct_DATA_Packet_Contro_fno = RSSI_SET_80;
+                        flag_rssiset_txen = 1;
+                    }
+                    break;
+                case RSSI_SET_90:
+                    if(flag_sw2_4 == 0)
+                    {
+                        RSSI_SET_VAL = 90;
+                        flag_rssi_set = 1;
+                        Struct_DATA_Packet_Contro_fno = RSSI_SET_90;
+                        flag_rssiset_txen = 1;
+                    }
+                    break;
+                case RSSI_SET_100:
+                    if(flag_sw2_4 == 0)
+                    {
+                        RSSI_SET_VAL = 100;
+                        flag_rssi_set = 1;
+                        Struct_DATA_Packet_Contro_fno = RSSI_SET_100;
+                        flag_rssiset_txen = 1;
+                    }
+                    break;
+                case RSSI_SET_110:
+                    if(flag_sw2_4 == 0)
+                    {
+                        RSSI_SET_VAL = 110;
+                        flag_rssi_set = 1;
+                        Struct_DATA_Packet_Contro_fno = RSSI_SET_110;
+                        flag_rssiset_txen = 1;
+                    }
+                    break;
+                case RSSI_SET_120:
+                    if(flag_sw2_4 == 0)
+                    {
+                        RSSI_SET_VAL = 120;
+                        flag_rssi_set = 1;
+                        Struct_DATA_Packet_Contro_fno = RSSI_SET_120;
+                        flag_rssiset_txen = 1;
+                    }
+                    break;
+
                 default:
                     break;
             }
@@ -1120,6 +1235,11 @@ void ID_Decode_OUT(void)
         {
             flag_update_his = 0;
             Save_OperationHistory(His_AddrOffset,HIS_DATA,b_offset);
+        }
+        if(flag_rssi_set)
+        {
+            flag_rssi_set = 0;
+            eeprom_write_byte(AddrEeprom_RssiSet,RSSI_SET_VAL);
         }
         FLAG_Receiver_BEEP = 0;
 		Receiver_OUT_OPEN = FG_NOT_allow_out;
@@ -1589,3 +1709,28 @@ u8 CheckID_Type(u32 id)
     return 1;
 }
 
+void login_set_rssi_tx(void);
+void Login_RssiSet_Init(void)
+{
+    if(flag_sw2_4 == 0 && flag_scan_off == 0)
+    {
+        flag_scan_off = 1;
+        PROFILE_CH_FREQ_32bit_200002EC = PROFILE_LOGIN_RSSISET_FREQ;
+        PROFILE_RADIO_AFC_CFG1_32bit_2000031C = 0x0005005B;
+        PROFILE_RADIO_DATA_RATE_32bit_200002FC = 0x6400000C;
+        ADF7030Cfg_pointer=ADF7030Cfg;
+        Radio_Date_Type = 1;
+        Status_Un.PROFILE_RxLowSpeed_TYPE = 1;
+        Channels = 0;
+        FLAG_APP_RX = 1;
+        ADF7030Init();
+        app_tx_en = 0;
+    }
+    else if(flag_sw2_4 == 1 && flag_scan_off == 1)
+    {
+        flag_scan_off = 0;
+        Channels = 1;
+        FLAG_APP_RX = 1;
+    }
+    if(flag_sw2_4 == 0 && flag_scan_off == 1 && flag_sw_f429m == 1) login_set_rssi_tx();
+}

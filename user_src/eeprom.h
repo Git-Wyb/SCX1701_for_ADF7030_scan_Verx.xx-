@@ -39,7 +39,7 @@ u32 R_ID(u8 *pid);
 /*
   2Kbyte EEPROM ADDR:                  0x1000 - 0x17FF.
   store Login 255 ID ADDR:             0x1000 - 0x12FC.
-  <Free Space ADDR>:                   0x12FD - 0x13A9.
+  <Free Space ADDR>:                   0x12FD - 0x13A8.
   store Set Automatic CLOSE time ADDR: 0x13AA.
   store Set Buzzer Switch ADDR:        0x13AB.
   store Communication ID ADDR:         0x13AC - 0x13AE.
@@ -50,6 +50,8 @@ u32 R_ID(u8 *pid);
 */
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #define addr_eeprom_sys 0x1000 // SYS=0x4000~0x400F
+
+#define AddrEeprom_RssiSet       0x3A9
 
 #define AddrEeprom_AutoOverTime  0x3AA
 #define AddrEeprom_BuzzerSwitch  0x3AB

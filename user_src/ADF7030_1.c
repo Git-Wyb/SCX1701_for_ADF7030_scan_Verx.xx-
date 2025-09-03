@@ -1387,5 +1387,83 @@ void Select_TX_frequency(void)
 
 	}
 
+void login_set_rssi_tx(void)
+{
+    char rssi;
+    if(flag_rssiset_txen && TIMER1s<=100 && (PROFILE_CH_FREQ_32bit_200002EC == PROFILE_LOGIN_RSSISET_FREQ))
+    {
+        flag_rssiset_txen = 0;
+        FLAG_APP_TX_fromUART=0;
+        FLAG_Key_TP3=0;
+        Last_Uart_Struct_DATA_Packet_Contro=Uart_Struct_DATA_Packet_Contro;
+        Last_Uart_Struct_DATA_Packet_Contro.Fno_Type.UN.type=1;
+        rssi=RAM_RSSI_AVG/128;
+        rssi=-rssi;
+        if(rssi>=127)rssi=127;
+        if(Radio_Date_Type_bak==2)rssi= rssi | 0x80;
+            Last_Uart_Struct_DATA_Packet_Contro.data[1].uc[0]= rssi;
+        if(FLAG_APP_TX_fromOUT==1)
+            Last_Uart_Struct_DATA_Packet_Contro.Fno_Type.UN.fno = Struct_DATA_Packet_Contro_fno;
+        FLAG_APP_TX_fromOUT=0;
+        TIME_APP_TX_fromOUT=0;
 
+        DEF_APP_TX_freq=3;
+        flag_rssiset_tx = 1;
+        FLAG_APP_RX=0;
+        APP_TX_freq=0;
+        TX_Scan_step=1;
+        First_TX_Scan=0;
+    }
+    if(flag_rssiset_tx==1)
+    {
+        if(TX_Scan_step==1)
+        {
+            TX_Scan_step=2;//Select_TX_frequency();
+            Time_APP_RXstart = 1000;
+        }
+        if(TX_Scan_step==2)
+        {
+            if(APP_TX_freq==0)
+            {
+                Receiver_LED_TX = 1;  //Struct_DATA_Packet_Contro_fno
+                TX_DataLoad(12345678,Struct_DATA_Packet_Contro_fno, &CONST_TXPACKET_DATA_20000AF0[0]);
+                //TX_DataLoad_HighSpeed(ID_SCX1801_DATA,Last_Uart_Struct_DATA_Packet_Contro, &CONST_TXPACKET_DATA_20000AF0[0]);
+                ADF7030_TRANSMITTING_FROM_POWEROFF();
+                Time_APP_blank_TX=10;
+                APP_TX_freq=1; //1
+            }
+            else if((APP_TX_freq < DEF_APP_TX_freq)&&(ADF7030_GPIO3 == 0)&&(Time_APP_blank_TX==0))
+            {
+                ADF7030_TRANSMITTING_FROM_POWEROFF();
+                Time_APP_blank_TX=10;
+                APP_TX_freq++;
+            }
+            else if((APP_TX_freq==DEF_APP_TX_freq)&&(ADF7030_GPIO3 == 0)&&(Time_APP_blank_TX==0))
+            {
+                APP_TX_freq++;
+                FLAG_APP_RXstart=1;
+                Time_APP_RXstart=1;
+                Receiver_LED_TX = 0;
+                FLAG_APP_TX_once=0;
+                flag_rssiset_tx = 0;
+            }
+            else if(Time_APP_RXstart == 0)
+            {
+                FLAG_APP_RXstart=1;
+                flag_rssiset_tx=0;
+                Time_APP_RXstart=1;
+                Receiver_LED_TX = 0;
+                FLAG_APP_TX_once=0;
+            }
+        }
+    }
+    if((FLAG_APP_RXstart==1)&&(Time_APP_RXstart==0)&&(FLAG_APP_TX_fromUART_err_read==0))
+    {
+        FLAG_APP_RXstart=0;
+        TIMER18ms=0;
+        FLAG_APP_RX=1;
+        flag_rssiset_tx=0;
+        ADF7030Init();
+    }
+}
 

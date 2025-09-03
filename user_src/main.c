@@ -82,6 +82,11 @@ void main(void)
     Status_Un.Receive_SignalType = 1;
     APP429M_Tx_State(); //上电发送一次状态
     GetInit_TFState();
+    if(flag_sw2_4 == 0)
+    {
+        flag_rssiset_txen = 1;
+        Struct_DATA_Packet_Contro_fno = (0xF0 | (RSSI_SET_VAL/10));
+    }
     while (1)
     {
         ClearWDT(); // Service the WDT
@@ -130,7 +135,7 @@ void main(void)
         {
             Beep_Action_On();
         }
-
+        Login_RssiSet_Init();
         SwTf_Input_Detection();
         if(flag_sw_usb == 0 && flag_usb_write == 0)
         {

@@ -136,7 +136,7 @@ void TIM4_UPD_OVF(void)
                 Receiver_LED_TX = 1;
                 Receiver_LED_OUT = 1;
                 PowerLED = 1;
-                BEEP_Module(300,1);
+                TIM3_init();
                 flag_usb_state = 2;
             }
             else

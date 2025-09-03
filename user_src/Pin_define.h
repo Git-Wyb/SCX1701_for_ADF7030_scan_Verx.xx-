@@ -312,5 +312,21 @@
 
 /*********************************************************************************/
 
+/* Login Rssi Set */
+#define RSSI_SET_00 0xF0
+#define RSSI_SET_10 0xF1
+#define RSSI_SET_20 0xF2
+#define RSSI_SET_30 0xF3
+#define RSSI_SET_40 0xF4
+#define RSSI_SET_50 0xF5
+#define RSSI_SET_60 0xF6
+#define RSSI_SET_70 0xF7
+#define RSSI_SET_80 0xF8
+#define RSSI_SET_90 0xF9
+#define RSSI_SET_100 0xFA
+#define RSSI_SET_110 0xFB
+#define RSSI_SET_120 0xFC
+#define Tx_RssiSet_Ack  0xFD
+
 #endif
 

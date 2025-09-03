@@ -192,6 +192,9 @@ void eeprom_sys_load(void)
     His_Num = (0xFF & ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_HisNum));
     if(His_Num > HIS_MAX) His_Num = HIS_MAX;
 
+    RSSI_SET_VAL = (0xFF & ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_RssiSet));
+    if(RSSI_SET_VAL < 1 || RSSI_SET_VAL > 120) RSSI_SET_VAL = 50;
+
     i = (0xFF & ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_HisOffsetH));
     j = (0xFF & ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_HisOffsetL));
     His_AddrOffset = (u16)((i << 8) | j);
