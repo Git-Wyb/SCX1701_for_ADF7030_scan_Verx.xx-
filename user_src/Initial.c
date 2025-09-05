@@ -734,6 +734,16 @@ void Dip_Sw_Detection(void)
             {
                 if(flag_sw_tf == 0)  {TF2_POWER = 0; flag_tf2 = 0;}
                 else TF2_POWER = 1;
+
+                if(flag_sw_f429m == 0)
+                {
+                    PROFILE_CH_FREQ_32bit_200002EC = 426075000;
+                    PROFILE_RADIO_AFC_CFG1_32bit_2000031C = 0x0005005A;
+                    PROFILE_RADIO_DATA_RATE_32bit_200002FC = 0x6400000C;
+                    Radio_Date_Type=1;
+					Channels=1;
+                    ADF7030Init();
+                }
             }
         }
     }

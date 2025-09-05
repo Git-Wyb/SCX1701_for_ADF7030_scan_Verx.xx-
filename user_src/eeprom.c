@@ -496,6 +496,7 @@ void ID_EEPROM_write_0x00(void)
 
 void ID_learn(void)
 {
+    u8 mrssi = 0;
     //    UINT16 i;
     // #if defined(__Product_PIC32MX2_Receiver__)
     //if (FG_10ms)
@@ -643,56 +644,63 @@ void ID_learn(void)
             }
             if ((FLAG_ID_Login_OK == 1) && (FLAG_ID_Login_OK_bank == 0))
             {
-                if ((ID_Receiver_Login == 0xFFFFFE) && (FLAG_ID_Erase_Login == 1))
-                    FLAG_ID_Login_OK_bank = 1; //杩藉姞澶氾拷??ID鐧诲綍
-                FLAG_ID_Login_OK = 0;          //杩藉姞澶氾拷??ID鐧诲綍
-                if (FLAG_ID_SCX1801_Login == 1)
+                FLAG_ID_Login_OK = 0;
+                mrssi = RAM_RSSI_AVG / 128;
+                mrssi = -mrssi;
+                if(mrssi >= 127) mrssi = 127;
+                if(0 < mrssi && mrssi <= RSSI_SET_VAL)
                 {
-                    FLAG_ID_SCX1801_Login = 0;
-                    FG_ID_SCX1801_Login_BEEP = 0;
-                    FLAG_ID_Login = 0;
-                    FLAG_ID_Erase_Login = 0;
-                    BEEP_and_LED();
-                    ID_SCX1801_EEPROM_write(ID_Receiver_Login);
-                    if (FLAG_IDCheck_OK == 1)
+                    if ((ID_Receiver_Login == 0xFFFFFE) && (FLAG_ID_Erase_Login == 1))
+                        FLAG_ID_Login_OK_bank = 1; //杩藉姞澶氾拷??ID鐧诲綍
+
+                    if (FLAG_ID_SCX1801_Login == 1)
                     {
-                        FLAG_IDCheck_OK = 0;
-                        Delete_GeneralID_EEPROM(ID_SCX1801_DATA);
+                        FLAG_ID_SCX1801_Login = 0;
+                        FG_ID_SCX1801_Login_BEEP = 0;
+                        FLAG_ID_Login = 0;
+                        FLAG_ID_Erase_Login = 0;
+                        BEEP_and_LED();
+                        ID_SCX1801_EEPROM_write(ID_Receiver_Login);
+                        if (FLAG_IDCheck_OK == 1)
+                        {
+                            FLAG_IDCheck_OK = 0;
+                            Delete_GeneralID_EEPROM(ID_SCX1801_DATA);
+                        }
+                        ID_Login_EXIT_Initial();
                     }
-                    ID_Login_EXIT_Initial();
-                }
-                else
-                {
-                    if (FLAG_IDCheck_OK == 1)
-                        FLAG_IDCheck_OK = 0;
                     else
                     {
-                        BEEP_and_LED();
-                        TIME_Login_EXIT_rest = 5380; //杩藉姞澶氾拷??ID鐧诲綍
-                        if ((FLAG_ID_Login == 1) && (ID_Receiver_Login != 0xFFFFFE))
-                            {
-                                if (ID_SCX1801_DATA == 0)
-                                    ID_SCX1801_EEPROM_write(ID_Receiver_Login);
-                                else ID_EEPROM_write();
-                            }
-                        else if (FLAG_ID_Erase_Login == 1)
+                        if (FLAG_IDCheck_OK == 1)
+                            FLAG_IDCheck_OK = 0;
+                        else
                         {
-                            if (FLAG_ID_Erase_Login_PCS == 1)
-                            {
-                                FLAG_ID_Erase_Login_PCS = 0;
-                                ID_DATA_PCS = 0;
-                                ALL_ID_EEPROM_Erase();
-                                ID_SCX1801_DATA = 0;
-                                ID_SCX1801_EEPROM_write(0x00);
-                                if(ID_Receiver_Login == 0xFFFFFE)
-                                    Status_Un.Exist_ID = 0;
-                                    if (ID_Receiver_Login != 0xFFFFFE)
+                            BEEP_and_LED();
+                            TIME_Login_EXIT_rest = 5380; //杩藉姞澶氾拷??ID鐧诲綍
+                            if ((FLAG_ID_Login == 1) && (ID_Receiver_Login != 0xFFFFFE))
+                                {
+                                    if (ID_SCX1801_DATA == 0)
                                         ID_SCX1801_EEPROM_write(ID_Receiver_Login);
-                            } //杩藉姞澶氾拷??ID鐧诲綍
-                            else if (ID_Receiver_Login != 0xFFFFFE)
-                                ID_EEPROM_write();
-                        }
-                    } //end else
+                                    else ID_EEPROM_write();
+                                }
+                            else if (FLAG_ID_Erase_Login == 1)
+                            {
+                                if (FLAG_ID_Erase_Login_PCS == 1)
+                                {
+                                    FLAG_ID_Erase_Login_PCS = 0;
+                                    ID_DATA_PCS = 0;
+                                    ALL_ID_EEPROM_Erase();
+                                    ID_SCX1801_DATA = 0;
+                                    ID_SCX1801_EEPROM_write(0x00);
+                                    if(ID_Receiver_Login == 0xFFFFFE)
+                                        Status_Un.Exist_ID = 0;
+                                        if (ID_Receiver_Login != 0xFFFFFE)
+                                            ID_SCX1801_EEPROM_write(ID_Receiver_Login);
+                                } //杩藉姞澶氾拷??ID鐧诲綍
+                                else if (ID_Receiver_Login != 0xFFFFFE)
+                                    ID_EEPROM_write();
+                            }
+                        } //end else
+                    }
                 }
             }
             if (TIME_Login_EXIT_rest)

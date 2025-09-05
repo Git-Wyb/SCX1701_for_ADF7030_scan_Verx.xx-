@@ -90,14 +90,8 @@ void ID_Decode_IDCheck(void)
                 {
                     if ((FLAG_ID_Erase_Login == 1) || (((FLAG_ID_Login == 1) ||(FLAG_ID_SCX1801_Login==1))&&(DATA_Packet_ID != 0xFFFFFE)))
                     {
-                        rrss=RAM_RSSI_AVG/128;
-                        rrss=-rrss;
-                        if(rrss>=127)rrss=127;
-                        if(rrss <= RSSI_SET_VAL)
-                        {
-                            FLAG_ID_Login_OK = 1;
-                            ID_Receiver_Login = DATA_Packet_ID;
-                        }
+                        FLAG_ID_Login_OK = 1;
+                        ID_Receiver_Login = DATA_Packet_ID;
                     }
                 }
             }
@@ -1248,7 +1242,7 @@ void ID_Decode_OUT(void)
             ;
         else if (TIME_Receiver_LED_OUT > 0)
             Receiver_LED_OUT = 1;
-        else if(TIME_power_led==0)
+        else if(TIME_power_led==0 && flag_usb_state != 2)
             Receiver_LED_OUT = 0;
 
         if((FLAG__Semi_open_T==1)||(FLAG__Semi_close_T==1))
@@ -1308,16 +1302,18 @@ void Freq_Scanning(void)
 					RSSI_Read_Counter = 0;
 					Flag_FREQ_Scan = 1;
 					if(Radio_Date_Type==1)
-					  {TIMER18ms = 82;TIMER300ms = 600; }
+					  {TIMER18ms = 300;TIMER300ms = 600; }
 					else if(Radio_Date_Type==2)
 					  {TIMER18ms = 130; TIMER300ms = 100;  }
 
 					return;
 				}
 			}
-
-			ADF7030_Change_Channel();
-			ADF7030Init();	   //��Ƶ��ʼ��
+            if(flag_sw_f429m == 1)
+            {
+                ADF7030_Change_Channel();
+                ADF7030Init();	   //��Ƶ��ʼ��
+            }
 
 			if(Radio_Date_Type==1)
 			  TIMER18ms = 18;

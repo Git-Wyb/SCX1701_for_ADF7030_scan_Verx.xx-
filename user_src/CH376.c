@@ -18,7 +18,6 @@ UINT8 *CTRL[] = {"OPEN","STOP","CLOSE"};
 
 UINT8 CH376FileOpen( PUINT8 name );
 UINT8 s = 0;
-UINT32 test_id = 0;
 UINT8 CH376_USB_Del(void)
 {
     //STRUCT_DATE H_DATA;
