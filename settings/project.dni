@@ -1,6 +1,6 @@
 [DebugChecksum]
 <<<<<<< HEAD
-Checksum=1046093707
+Checksum=-372820214
 =======
 Checksum=773928336
 >>>>>>> f03119bb9d9418453f7da9e2e3549a267f3e0d0b
@@ -132,6 +132,11 @@ Fmt30={W}42:uart_rx_data	4	0
 LogEnabled=0
 GraphEnabled=0
 ShowTimeLog=1
+[Breakpoints]
+Bp0=_ "STD_CODE" "{$PROJ_DIR$\user_src\eeprom.c}.656.21" 1 0 0 0 "" 0 ""
+Bp1=_ "STD_CODE" "{$PROJ_DIR$\user_src\eeprom.c}.654.25" 1 0 0 0 "" 0 ""
+Bp2=_ "STD_CODE" "{$PROJ_DIR$\user_src\ADF7030_1.c}.1339.16" 1 0 0 0 "" 0 ""
+Count=3
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -139,12 +144,6 @@ Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
-[Breakpoints]
-Bp0=_ "STD_CODE" "{$PROJ_DIR$\user_src\eeprom.c}.655.21" 1 0 0 0 "" 0 ""
-Bp1=_ "STD_CODE" "{$PROJ_DIR$\user_src\eeprom.c}.653.25" 1 0 0 0 "" 0 ""
-Bp2=_ "STD_CODE" "{$PROJ_DIR$\user_src\Initial.c}.861.17" 1 0 0 0 "" 0 ""
-Bp3=_ "STD_CODE" "{$PROJ_DIR$\user_src\Initial.c}.866.17" 1 0 0 0 "" 0 ""
-Count=4
 [Aliases]
 A0=_ "" ""
 A1=_ "D:\MyCloud\Working\Windowshade\Windowshade7030\user_src\ADF7030_1.c" "F:\Source Code\bunka-s\Bunka STM8L151G6 RX_ADF7030 Source CRX1831DC\Windowshade7030\user_src\ADF7030_1.c"

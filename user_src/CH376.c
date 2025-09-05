@@ -76,14 +76,14 @@ UINT8 CH376_USB_Del(void)
 
             if(ID_Nums > 0)
             {
-                s = sprintf(File_ID,"%ld\r\n",ID_SCX1801_DATA);
+                s = sprintf(File_ID,"%08ld\r\n",ID_SCX1801_DATA);
                 s = CH376ByteWrite(File_ID, s, NULL);
                 if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
                 ID_Nums = ID_Nums - 1;
             }
             for(si=0; si<ID_Nums; si++)
             {
-                s = sprintf(File_ID,"%ld\r\n",ID_Receiver_DATA_READ(&ID_Receiver_DATA[si][0]));
+                s = sprintf(File_ID,"%08ld\r\n",ID_Receiver_DATA_READ(&ID_Receiver_DATA[si][0]));
                 s = CH376ByteWrite(File_ID, s, NULL);
                 if ( s != USB_INT_SUCCESS ) return ERR_USB_UNKNOWN;
             }
@@ -101,7 +101,7 @@ UINT8 CH376_USB_Del(void)
                 else if (HIS_DATA[0].History_s.CODE == 0x04) s = 1;
                 else if (HIS_DATA[0].History_s.CODE == 0x02) s = 2;
                 else s = 1;
-                s = sprintf( buf,"20%0*d/%0*d/%0*d_%0*d:%0*d:%0*d_%s_%ld_%s_-%ddBm\r\n",2,HIS_DATA[0].History_s.YY,2,HIS_DATA[0].History_s.MM,2,HIS_DATA[0].History_s.DD,
+                s = sprintf( buf,"20%0*d/%0*d/%0*d_%0*d:%0*d:%0*d_%s_%08ld_%s_-%ddBm\r\n",2,HIS_DATA[0].History_s.YY,2,HIS_DATA[0].History_s.MM,2,HIS_DATA[0].History_s.DD,
                             2,HIS_DATA[0].History_s.HH,2,HIS_DATA[0].History_s.MI,2,HIS_DATA[0].History_s.SS,TYPE[CheckID_Type(r_id)],r_id,CTRL[s],HIS_DATA[0].History_s.RS);
                 s = CH376ByteWrite( buf, s, NULL);
                 ClearWDT();

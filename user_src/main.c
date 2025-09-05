@@ -103,16 +103,13 @@ void main(void)
         //接收到特殊ID并且有ID登录或者接收到429MHz开闭指令有动作就启动蜂鸣器
         if((Status_Un.Exist_ID == 1))
         {
-            BEEP_Module(300,1);
+            //BEEP_Module(300,1);
         }
         if (FLAG_APP_RX == 1)
         {
             Freq_Scanning();
-            //if(Scan_step==2)
             SCAN_RECEIVE_PACKET(); //ɨ���������?
         }
-     //   TranmissionACK();
-    //        READ_RSSI_avg();
 
         if (FG_Receiver_LED_RX == 1)
             Receiver_LED_RX = 1;
@@ -134,6 +131,7 @@ void main(void)
         {
             Beep_Action_On();
         }
+
         Login_RssiSet_Init();
         SwTf_Input_Detection();
         if(flag_sw_usb == 0 && flag_usb_write == 0)

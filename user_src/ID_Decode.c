@@ -165,7 +165,7 @@ void ID_Decode_IDCheck(void)
 
                                 PAYLOAD_SIZE = RX_PayLoadSizeNOLogin;
                                 Flag_TX_ID_load=0;
-                                if ((DATA_Packet_Control == 0x40) && (Manual_override_TIMER == 0))
+                                if ((DATA_Packet_Control == 0x40) && (Manual_override_TIMER == 0) && (flag_tf1==0) && (flag_tf2==0))
                                 {
                                     TIME_auto_out = 900 * (auto_over_time - 1);
 
@@ -620,11 +620,13 @@ void ID_Decode_OUT(void)
                         {
                             Receiver_OUT_STOP = FG_allow_out;
                             Receiver_OUT_OPEN = FG_NOT_allow_out;
+                            if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,0x04);
                         } //1830
                         else if (TIMER1s > 1000)
                         {
                             Receiver_OUT_STOP = FG_NOT_allow_out;
                             Receiver_OUT_OPEN = FG_NOT_allow_out;
+                            flag_rerx = 0;
                         } //810
                         else
                         {
@@ -632,6 +634,7 @@ void ID_Decode_OUT(void)
                                 FG_auto_open_time = 1;
                             Receiver_OUT_STOP = FG_NOT_allow_out;
                             Receiver_OUT_OPEN = FG_allow_out;
+                            if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,0x08);
                             Status_Un.Receive_SignalType = 0; //受信于自动信号
                             Status_Un.ActionOpenOrClose = 1;  //开动作
                             Time_NoCheck_AutoSignal = 4600;//50s;//2300//25s
@@ -669,13 +672,16 @@ void ID_Decode_OUT(void)
                     Tone_OFF();  //只要接收到操作指令就关闭蜂鸣器
                     close_action_auto_beep_flag = 0;
                     beep_num = 0;
-                    if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,Control_i);
                     if(Status_Un.PROFILE_RxLowSpeed_TYPE == 0)   //426M
                     {
                         Receiver_OUT_OPEN = FG_NOT_allow_out;
                         Receiver_OUT_STOP = FG_NOT_allow_out;
                         Receiver_OUT_VENT = FG_NOT_allow_out;
-                        if(TIMER1s < 985) Receiver_OUT_CLOSE = FG_allow_out;
+                        if(TIMER1s < 985)
+                        {
+                            Receiver_OUT_CLOSE = FG_allow_out;
+                            if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,Control_i);
+                        }
                         Status_Un.ActionOpenOrClose = 0;  //闭动作
                         operat_action_flag = 1;
                         close_action_beep_flag = 0;
@@ -690,12 +696,15 @@ void ID_Decode_OUT(void)
                                 Receiver_OUT_CLOSE = FG_NOT_allow_out;
                                 Receiver_OUT_VENT = FG_NOT_allow_out;
                                 Receiver_OUT_OPEN = FG_NOT_allow_out;
+                                if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,0x04);
                                 break;
                             case 1:
                                 Receiver_OUT_STOP = FG_NOT_allow_out;
+                                flag_rerx = 0;
                                 break;
                             case 2:
                                 Receiver_OUT_CLOSE = FG_allow_out;
+                                if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,0x02);
                                 Status_Un.ActionOpenOrClose = 0;  //闭动作
                                 operat_action_flag = 1;
                                 recv_429code_flag = 1;
@@ -737,13 +746,17 @@ void ID_Decode_OUT(void)
                     close_action_beep_flag = 0;
                     beep_num = 0;
                     recv_429code_flag = 0;
-                    if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,Control_i);
+
                     if(Status_Un.PROFILE_RxLowSpeed_TYPE == 0)   //426M
                     {
                         Receiver_OUT_STOP = FG_NOT_allow_out;
                         Receiver_OUT_CLOSE = FG_NOT_allow_out;
                         Receiver_OUT_VENT = FG_NOT_allow_out;
-                        if(TIMER1s < 985) Receiver_OUT_OPEN = FG_allow_out;
+                        if(TIMER1s < 985)
+                        {
+                            Receiver_OUT_OPEN = FG_allow_out;
+                            if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,Control_i);
+                        }
                         Status_Un.ActionOpenOrClose = 1; //开动作
                         operat_action_flag = 1;
 
@@ -758,12 +771,15 @@ void ID_Decode_OUT(void)
                                 Receiver_OUT_CLOSE = FG_NOT_allow_out;
                                 Receiver_OUT_VENT = FG_NOT_allow_out;
                                 Receiver_OUT_OPEN = FG_NOT_allow_out;
+                                if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,0x04);
                                 break;
                             case 1:
                                 Receiver_OUT_STOP = FG_NOT_allow_out;
+                                flag_rerx = 0;
                                 break;
                             case 2:
                                 Receiver_OUT_OPEN = FG_allow_out;
+                                if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,0x08);
                                 Status_Un.ActionOpenOrClose = 1; //开动作
                                 operat_action_flag = 1;
                                 break;
@@ -1168,7 +1184,7 @@ void ID_Decode_OUT(void)
         if ((FG_auto_out == 1) && (TIME_auto_out == 0))
         {
             FG_auto_out = 0;
-            if(flag_tf1 == 0)
+            if(flag_tf1 == 0 && flag_tf2 == 0)  //检测无,可以输出自动闭
             {
                 TIME_auto_close = 270;
                 Receiver_LED_OUT = 1;
@@ -1181,16 +1197,19 @@ void ID_Decode_OUT(void)
             {
                 Receiver_OUT_STOP = FG_allow_out;
                 Receiver_OUT_CLOSE = FG_NOT_allow_out;
+                if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,0x04);
             } //200
             else if (TIME_auto_close > 90)
             {
                 Receiver_OUT_STOP = FG_NOT_allow_out;
                 Receiver_OUT_CLOSE = FG_NOT_allow_out;
+                flag_rerx = 0;
             } //100
             else
             {
                 Receiver_OUT_STOP = FG_NOT_allow_out;
                 Receiver_OUT_CLOSE = FG_allow_out;
+                if(flag_rerx == 0) Set_OperationHistory(DATA_Packet_ID,0x02);
                 Status_Un.Receive_SignalType = 0;
                 Status_Un.ActionOpenOrClose = 0; //闭动作中
                 operat_action_flag = 1;
@@ -1224,9 +1243,10 @@ void ID_Decode_OUT(void)
                 eeprom_write_byte(AddrEeprom_BuzzerSwitch,0x01);
             }
         }
-        flag_rerx = 0;
-        if(flag_update_his)
+
+        if(flag_update_his && TIME_auto_close == 0)
         {
+            flag_rerx = 0;
             flag_update_his = 0;
             Save_OperationHistory(His_AddrOffset,HIS_DATA,b_offset);
         }
@@ -1309,11 +1329,9 @@ void Freq_Scanning(void)
 					return;
 				}
 			}
-            if(flag_sw_f429m == 1)
-            {
-                ADF7030_Change_Channel();
-                ADF7030Init();	   //��Ƶ��ʼ��
-            }
+
+            ADF7030_Change_Channel();
+            ADF7030Init();	   //��Ƶ��ʼ��
 
 			if(Radio_Date_Type==1)
 			  TIMER18ms = 18;

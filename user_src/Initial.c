@@ -835,6 +835,17 @@ void TF1_Detection(void)
     if(flag_tf1_in == 1 && Time_TF1 == 0)
     {
         flag_tf1 = 1;
+        //车辆传感器信号检测有效,解除自动模式,停止时间监测,受信机恢复到初始状态
+        FG_auto_out = 0;
+        TIME_auto_out = 0;
+        TIME_auto_close = 0;
+        FG_auto_open_time = 0;
+        FG_auto_manual_mode = 0;
+        Manual_override_TIMER = 0;
+        auto_receive_cnt = 0;
+        time_receive_auto = 0;
+        Time_Check_AutoSignal = 0;
+        Time_NoCheck_AutoSignal = 0;
     }
     else if(flag_tf1_in == 0 && Time_TF1 == 0)
     {
@@ -880,6 +891,17 @@ void TF2_Detection(void)
     if(flag_tf2_in == 1 && Time_TF2 == 0)
     {
         flag_tf2 = 1;
+        //车辆传感器信号检测有效,解除自动模式,停止时间监测,受信机恢复到初始状态
+        FG_auto_out = 0;
+        TIME_auto_out = 0;
+        TIME_auto_close = 0;
+        FG_auto_open_time = 0;
+        FG_auto_manual_mode = 0;
+        Manual_override_TIMER = 0;
+        auto_receive_cnt = 0;
+        time_receive_auto = 0;
+        Time_Check_AutoSignal = 0;
+        Time_NoCheck_AutoSignal = 0;
     }
     else if(flag_tf2_in == 0 && Time_TF2 == 0)
     {

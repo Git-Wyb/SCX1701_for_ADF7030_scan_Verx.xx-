@@ -64,7 +64,7 @@ void TIM4_UPD_OVF(void)
         else if (TIME_auto_out)
         {
             --TIME_auto_out;
-            if(TIME_auto_out==180 || TIME_auto_out==90)
+            if((TIME_auto_out==180 || TIME_auto_out==90) && (flag_tf1 == 0) && (flag_tf2 == 0))
             {
                 Beep_Switch = 1;
             }
