@@ -1715,7 +1715,7 @@ u8 CheckID_Type(u32 id)
 {
     if(11000000 <= id && id < 12000000) return 0;
     if(13000000 <= id && id < 15000000) return 1;
-    if(15000000 <= id && id < 16000000) return 2;
+    if(15000000 <= id && id < 15100000) return 2;
     if( 2000000 <= id && id <  3000000) return 3;
     if( 3000000 <= id && id <  4000000) return 4;
     if( 4000000 <= id && id <  5000000) return 5;
