@@ -1746,5 +1746,5 @@ void Login_RssiSet_Init(void)
         Channels = 1;
         FLAG_APP_RX = 1;
     }
-    if(flag_sw2_4 == 0 && flag_scan_off == 1 && flag_sw_f429m == 1) login_set_rssi_tx();
+    if(flag_sw2_4 == 0 && flag_scan_off == 1 && flag_sw_f429m == 0) login_set_rssi_tx();
 }

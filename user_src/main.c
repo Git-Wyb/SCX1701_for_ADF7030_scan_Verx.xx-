@@ -95,7 +95,7 @@ void main(void)
         if (time_Login_exit_256 == 0)
             ID_Decode_OUT();
         ID_learn();
-        if((ID_SCX1801_DATA != 0) && Receiver_429MHz_mode == 0 && Status_Un.Exist_ID != 1 && flag_sw_f429m == 1)//有ID登录且不是万能码遥控就发送状态
+        if((ID_SCX1801_DATA != 0) && Receiver_429MHz_mode == 0 && Status_Un.Exist_ID != 1 && flag_sw_f429m == 0)//有ID登录且不是万能码遥控就发送状态
         {
             APP_TX_PACKET();
         }

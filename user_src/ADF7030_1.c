@@ -1087,7 +1087,7 @@ u32 ADF7030_Read_RESIGER(u32 addr, u32 Para, u8 offset)
 **/
 	void ADF7030_Change_Channel(void)
 	{
-		if ((FLAG_ID_Erase_Login == 1) || (FLAG_ID_Login == 1) ||(FLAG_ID_SCX1801_Login==1)||(Receiver_426MHz_mode==1)||(flag_sw_f429m == 0))
+		if ((FLAG_ID_Erase_Login == 1) || (FLAG_ID_Login == 1) ||(FLAG_ID_SCX1801_Login==1)||(Receiver_426MHz_mode==1)||(flag_sw_f429m == 1))
 		{
             PROFILE_CH_FREQ_32bit_200002EC = 426075000;
             PROFILE_RADIO_AFC_CFG1_32bit_2000031C = 0x0005005A;
