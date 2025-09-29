@@ -668,7 +668,7 @@ void ID_Decode_OUT(void)
                         Receiver_OUT_OPEN = FG_NOT_allow_out;
                         Receiver_OUT_STOP = FG_NOT_allow_out;
                         Receiver_OUT_VENT = FG_NOT_allow_out;
-                        if(TIMER1s < 985) Receiver_OUT_CLOSE = FG_allow_out;
+                        if(TIMER1s < 950) Receiver_OUT_CLOSE = FG_allow_out;
                         Status_Un.ActionOpenOrClose = 0;  //闭动作
                         operat_action_flag = 1;
                         close_action_beep_flag = 0;
@@ -707,7 +707,7 @@ void ID_Decode_OUT(void)
                     Receiver_OUT_VENT = FG_NOT_allow_out;
                     if(Status_Un.PROFILE_RxLowSpeed_TYPE == 0)    //426M
                     {
-                        if(TIMER1s < 985) Receiver_OUT_STOP = FG_allow_out;
+                        if(TIMER1s < 950) Receiver_OUT_STOP = FG_allow_out;
                     }
                     else
                         Receiver_OUT_STOP = FG_allow_out;
@@ -734,7 +734,7 @@ void ID_Decode_OUT(void)
                         Receiver_OUT_STOP = FG_NOT_allow_out;
                         Receiver_OUT_CLOSE = FG_NOT_allow_out;
                         Receiver_OUT_VENT = FG_NOT_allow_out;
-                        if(TIMER1s < 985) Receiver_OUT_OPEN = FG_allow_out;
+                        if(TIMER1s < 950) Receiver_OUT_OPEN = FG_allow_out;
                         Status_Un.ActionOpenOrClose = 1; //开动作
                         operat_action_flag = 1;
 
