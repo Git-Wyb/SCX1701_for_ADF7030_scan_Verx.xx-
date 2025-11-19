@@ -193,13 +193,13 @@ void eeprom_sys_load(void)
     if(auto_over_time < 1 || auto_over_time > 13) auto_over_time = 4;   //The initial default is 30 seconds
 
     i = (0xFF & ReadByteEEPROM(addr_eeprom_sys + AddrEeprom_BuzzerSwitch)); //读取设定的蜂鸣器开关
-    if(i == Save_Disable_Beep)
+    if(i == 0x01)
     {
-        Status_Un.Buzzer_Switch = 0;
+        Status_Un.Buzzer_Switch = 1;
     }
     else
     {
-        Status_Un.Buzzer_Switch = 1;   //初始默认可以开启蜂鸣器
+        Status_Un.Buzzer_Switch = 0;   //初始默认关闭蜂鸣器
     }
 
     xm[0] = ReadByteEEPROM(addr_eeprom_sys + 0x3FB);
