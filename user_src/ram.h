@@ -104,7 +104,7 @@ extern u8 TIME_10ms;
 extern u16 TIMER1s;
 extern u16 TIMER300ms;
 extern u16 TIMER18ms;
-extern u16 TIMER250ms_STOP;
+extern u32 TIMER250ms_STOP;
 extern u16 TIME_auto_out;
 extern u16 TIME_auto_close;
 //extern u16 time_3sec;
@@ -250,8 +250,12 @@ extern u16 Time_error_read_timeout;
 extern u8 ERROR_Read_sendTX_count;
 extern u8 ERROR_Read_sendTX_packet;
 extern u8 Flag_ERROR_Read_once_again;
+extern u16 TIMER_Semi_open;
+extern u16 TIMER_Semi_close;
 
 extern u16 time_sw;
 
+extern u8 data_sta;
+extern u8 normal_sta;
 
 #endif

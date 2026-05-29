@@ -34,7 +34,7 @@ u8 TIME_10ms = 0;
 u16 TIMER1s = 0;
 u16 TIMER300ms = 0;
 u16 TIMER18ms = 0;
-u16 TIMER250ms_STOP = 0;
+u32 TIMER250ms_STOP = 0;
 u16 TIME_auto_out = 0;
 u16 TIME_auto_close = 0;
 //u16 time_3sec = 0;
@@ -171,8 +171,8 @@ u16 BASE_TIME_BEEP_off = 0;
 Wireless_Body Struct_DATA_Packet_Contro,Struct_DATA_Packet_Contro_buf;
 Wireless_Body Uart_Struct_DATA_Packet_Contro,Last_Uart_Struct_DATA_Packet_Contro;
 u8 Struct_DATA_Packet_Contro_fno=0;
-//u16 TIMER_Semi_open;
-//u16 TIMER_Semi_close;
+u16 TIMER_Semi_open;
+u16 TIMER_Semi_close;
 u8 FLAG__Semi_open_T=0;
 u8 FLAG__Semi_close_T=0;
 u16 TIME_APP_TX_fromOUT=0;
@@ -190,7 +190,8 @@ u8 ERROR_Read_sendTX_count=0;
 u8 ERROR_Read_sendTX_packet=0;
 u8 Flag_ERROR_Read_once_again=0;
 
-
+u8 data_sta = 0;
+u8 normal_sta = 0;
 
 
 

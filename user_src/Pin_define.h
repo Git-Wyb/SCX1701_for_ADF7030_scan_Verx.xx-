@@ -272,6 +272,13 @@
 #define Tx_Close_Action_StatusNG    0xBC  /* 闭动作中(无效),自动信号无效的状态 */
 #define Tx_Abnormal_StatusNG        0xBD  /* 异常1状态(无效),自动信号无效的状态*/
 
+#define TxClose_Status          0x32   // 全闭
+#define TxOpen_Action_Status    0x33   // 开动作中
+#define TxClose_Action_Status   0x34   // 闭动作中
+#define TxOpen_Status           0x35   // 开
+#define TxNormal_Status         0x00   // 无异常
+#define TxAbnormal_Status       0x04   // 障碍物感知
+
 /*********************************************************************************/
 
 #endif

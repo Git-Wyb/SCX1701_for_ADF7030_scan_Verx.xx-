@@ -257,23 +257,24 @@ void ID_Decode_IDCheck(void)
                        else TIMER1s = 1000;
                     }
 			    }
-			/*	else if(Radio_Date_Type_bak==2)
+				else if(Radio_Date_Type_bak==2)
 				{
 				   DATA_Packet_Control=0;
 				   Struct_DATA_Packet_Contro_fno=Struct_DATA_Packet_Contro.Fno_Type.UN.fno;
 				   if(Struct_DATA_Packet_Contro.Fno_Type.UN.type==1) DATA_Packet_Control=Struct_DATA_Packet_Contro.data[0].uc[0];
 					if(((DATA_Packet_Control&0xA0)==0x20)||((DATA_Packet_Control&0xC0)==0x40))TIMER1s=500;
 					else if(((DATA_Packet_Control&0xDF)>0x80)&&((DATA_Packet_Control&0x20)==0x00)){
-						TIMER1s=1000;//(TIMER_Semi_open+1)*1000;
-						if((DATA_Packet_Control&0xDF)<0xC0)TIMER_Semi_open=(DATA_Packet_Control&0x1F)+4;
-						else TIMER_Semi_close=(DATA_Packet_Control&0x1F)+4;
+						TIMER1s=3000;//(TIMER_Semi_open+1)*1000;
+						if((DATA_Packet_Control&0xDF)<0xC0)TIMER_Semi_open = (DATA_Packet_Control&0x1F) * 10 + 20;//(DATA_Packet_Control&0x1F)+4;
+						else TIMER_Semi_close = (DATA_Packet_Control&0x1F) * 10 + 20;//(DATA_Packet_Control&0x1F)+4;
 					}
 					else
                         TIMER1s=1000;
 					FLAG_APP_TX_once=1;
                     TIMER300ms = 100;
 		            FG_Receiver_LED_RX = 1;
-				} */
+                    Status_Un.PROFILE_RxLowSpeed_TYPE = 1;
+				}
             }
 
 
@@ -394,11 +395,11 @@ void eeprom_IDcheck(void)
                     i++;
                 } while (i < ID_DATA_PCS);
 		}
-		else if((PROFILE_CH_FREQ_32bit_200002EC == 429175000 || PROFILE_CH_FREQ_32bit_200002EC == 429200000)&&(DATA_Packet_ID==ID_SCX1801_DATA))
+		else if((Radio_Date_Type_bak==2)&&(DATA_Packet_ID==ID_SCX1801_DATA))
 		{
 			FLAG_IDCheck_OK = 1;
-			//Struct_DATA_Packet_Contro=Struct_DATA_Packet_Contro_buf;
-            DATA_Packet_Control = DATA_Packet_Contro_buf;
+			Struct_DATA_Packet_Contro=Struct_DATA_Packet_Contro_buf;
+            //DATA_Packet_Control = DATA_Packet_Contro_buf;
 		}
 #else
 			for (i = 0; i < ID_DATA_PCS; i++)
@@ -845,6 +846,7 @@ void ID_Decode_OUT(void)
                     beep_num = 0;
 
                 break;
+                /*
                 case CLOSE_AUTO_DECLINE:
                     if(Status_Un.PROFILE_RxLowSpeed_TYPE == 1)    //429M
                     {
@@ -982,11 +984,11 @@ void ID_Decode_OUT(void)
                         Struct_DATA_Packet_Contro_fno = Tx_Setting_Status;
                         app_tx_en = 1;
                     }
-                break;
+                break;*/
                 default:
                     break;
             }
-          /*  if(Radio_Date_Type_bak==2)
+            if(Radio_Date_Type_bak==2)
             {             //429M   半开信号/半闭
                 if(((DATA_Packet_Control&0xDF)>0x80)&&((DATA_Packet_Control&0x20)==0x00))
                 {
@@ -994,22 +996,61 @@ void ID_Decode_OUT(void)
                         FLAG__Semi_open_T=1;
                         FLAG__Semi_close_T=0;
                         Receiver_LED_OUT=1;
-                        Receiver_OUT_STOP=FG_NOT_allow_out;
-                        Receiver_OUT_CLOSE=FG_NOT_allow_out;
-                        Receiver_OUT_OPEN=FG_allow_out;
-                        TIMER250ms_STOP=((TIMER_Semi_open+1)*1000/107)*100;
+                        //Receiver_OUT_STOP=FG_NOT_allow_out;
+                        //Receiver_OUT_CLOSE=FG_NOT_allow_out;
+                        //Receiver_OUT_OPEN=FG_allow_out;
+                        TIMER250ms_STOP=((u32)(TIMER_Semi_open)*1000);///107)*100;
+
+                        switch(Flag_429M_EndStop)
+                        {
+                            case 0:
+                                Receiver_OUT_STOP = FG_allow_out;
+                                Receiver_OUT_CLOSE = FG_NOT_allow_out;
+                                Receiver_OUT_VENT = FG_NOT_allow_out;
+                                Receiver_OUT_OPEN = FG_NOT_allow_out;
+                                break;
+                            case 1:
+                                Receiver_OUT_STOP = FG_NOT_allow_out;
+                                break;
+                            case 2:
+                                Receiver_OUT_OPEN = FG_allow_out;
+                                Status_Un.ActionOpenOrClose = 1; //开动作
+                                operat_action_flag = 1;
+                                break;
+                        }
+                        APP429M_Tx_State();
                     }
                     else
                     {
                         FLAG__Semi_open_T=0;
                         FLAG__Semi_close_T=1;
                         Receiver_LED_OUT=1;
-                        Receiver_OUT_STOP=FG_NOT_allow_out;
-                        Receiver_OUT_CLOSE=FG_allow_out;
-                        Receiver_OUT_OPEN=FG_NOT_allow_out;
-                        TIMER250ms_STOP=((TIMER_Semi_close+1)*1000/107)*100;
+                        //Receiver_OUT_STOP=FG_NOT_allow_out;
+                        //Receiver_OUT_CLOSE=FG_allow_out;
+                        //Receiver_OUT_OPEN=FG_NOT_allow_out;
+                        TIMER250ms_STOP=((u32)(TIMER_Semi_close)*1000);///107)*100;
+
+                        switch(Flag_429M_EndStop)
+                        {
+                            case 0:
+                                Receiver_OUT_STOP = FG_allow_out;
+                                Receiver_OUT_CLOSE = FG_NOT_allow_out;
+                                Receiver_OUT_VENT = FG_NOT_allow_out;
+                                Receiver_OUT_OPEN = FG_NOT_allow_out;
+                                break;
+                            case 1:
+                                Receiver_OUT_STOP = FG_NOT_allow_out;
+                                break;
+                            case 2:
+                                Receiver_OUT_CLOSE = FG_allow_out;
+                                Status_Un.ActionOpenOrClose = 0;  //闭动作
+                                operat_action_flag = 1;
+                                recv_429code_flag = 1;
+                                break;
+                        }
+                        APP429M_Tx_State();
                     }
-                }
+                } /*
                 if((DATA_Packet_Control==0x7F)&&(Flag_ERROR_Read==0)&&(Flag_shutter_stopping==0))
                 {
                     Flag_ERROR_Read=1;
@@ -1018,8 +1059,8 @@ void ID_Decode_OUT(void)
                     Flag_ERROR_Read_once_again=1;
                     TIME_ERROR_Read_once_again=17;
                     Time_error_read_timeout=100;
-                }
-            } */
+                }  */
+            }
             if((FLAG__Semi_open_T==1)||(FLAG__Semi_close_T==1))
             {
                 if((DATA_Packet_Control==0x02)||(DATA_Packet_Control==0x04)||(DATA_Packet_Control==0x08)||(DATA_Packet_Control==0x01)||(DATA_Packet_Control==0x20)||(DATA_Packet_Control==0x40)
@@ -1126,6 +1167,7 @@ void ID_Decode_OUT(void)
                 Receiver_OUT_STOP=FG_NOT_allow_out;
                 FLAG__Semi_open_T=0;
                 FLAG__Semi_close_T=0;
+                APP429M_Tx_State();
             }
         }
         else if((TIMER250ms_STOP==0)&&(TIME_auto_close==0))
@@ -1210,7 +1252,9 @@ void Action_Signal_Detection(void)
             Status_Un.Flag_LowerLimit = local_sta.Flag_LowerLimit;
             Status_Un.Flag_AbnormalSignal = local_sta.Flag_AbnormalSignal;
             Status_Un.Flag_ActionSignal =  local_sta.Flag_ActionSignal;
+            APP429M_Tx_State();
 
+            /*
             if(Status_Un.Flag_LowerLimit == 0)  //下限
             {
                 if(Manual_override_TIMER)
@@ -1306,6 +1350,7 @@ void Action_Signal_Detection(void)
                 Status_Un.ActionOpenOrClose = 0;
                 recv_429code_flag = 0;
             }
+            */
         }
     }
     else
@@ -1316,7 +1361,7 @@ void Action_Signal_Detection(void)
 
 //判断,发送状态
 void APP429M_Tx_State(void)
-{
+{   /*
     if(Lower_Limit_Signal == 0)
     {
         if(Manual_override_TIMER)
@@ -1358,7 +1403,21 @@ void APP429M_Tx_State(void)
             Struct_DATA_Packet_Contro_fno = Tx_Open_StatusNG;
         else
             Struct_DATA_Packet_Contro_fno = Tx_Open_Status;
+    }*/
+
+    if(Lower_Limit_Signal == 0) data_sta = TxClose_Status;
+    else if(Action_Signal == 0)
+    {
+        if(Status_Un.ActionOpenOrClose == 1)   //开动作
+            data_sta = TxOpen_Action_Status;
+        else
+            data_sta = TxClose_Action_Status;
     }
+    else
+        data_sta = TxOpen_Status;
+
+    if(Abnormal_Signal == 0) normal_sta = TxAbnormal_Status;
+    else normal_sta = TxNormal_Status;
     app_tx_en = 1;          //开启发送
 }
 
