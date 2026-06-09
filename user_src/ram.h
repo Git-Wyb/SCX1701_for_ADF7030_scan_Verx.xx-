@@ -196,6 +196,7 @@ extern u8 auto_receive_cnt;
 extern u8 time_receive_auto;
 extern u8 Time_StateDetection;
 extern u8 sta_change;
+extern u8 sta_change2;
 extern u8 time_close_auto_beep;
 extern u8 beep_num;
 extern u16 TIME_BEEP_on;

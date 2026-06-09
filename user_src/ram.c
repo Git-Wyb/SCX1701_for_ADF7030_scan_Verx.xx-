@@ -157,6 +157,7 @@ u8 time_receive_auto = 0;
 u8 Flag_429M_EndStop = 0;
 u8 Time_StateDetection  = 0;
 u8 sta_change = 0;
+u8 sta_change2 = 0;
 u8 time_close_auto_beep = 0;
 u8 beep_num = 0;
 u8 Channels=1;

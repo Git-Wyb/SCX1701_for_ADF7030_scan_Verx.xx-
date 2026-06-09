@@ -268,6 +268,10 @@ void ID_Decode_IDCheck(void)
 						if((DATA_Packet_Control&0xDF)<0xC0)TIMER_Semi_open = (DATA_Packet_Control&0x1F) * 10 + 20;//(DATA_Packet_Control&0x1F)+4;
 						else TIMER_Semi_close = (DATA_Packet_Control&0x1F) * 10 + 20;//(DATA_Packet_Control&0x1F)+4;
 					}
+                    else if(((DATA_Packet_Control & 0xFF) == 0x02) || ((DATA_Packet_Control & 0xFF) == 0x08))//429M
+                    {
+                        TIMER1s = 3000; //约3.0s
+                    }
 					else
                         TIMER1s=1000;
 					FLAG_APP_TX_once=1;
@@ -1252,8 +1256,42 @@ void Action_Signal_Detection(void)
             Status_Un.Flag_LowerLimit = local_sta.Flag_LowerLimit;
             Status_Un.Flag_AbnormalSignal = local_sta.Flag_AbnormalSignal;
             Status_Un.Flag_ActionSignal =  local_sta.Flag_ActionSignal;
-            APP429M_Tx_State();
-
+            //APP429M_Tx_State();
+            normal_sta = TxNormal_Status;
+            data_sta = TxOpen_Status;
+            if(Lower_Limit_Signal == 0)
+            {
+                data_sta = TxClose_Status;
+                sta_change2 = data_sta;
+            }
+            else if(Abnormal_Signal == 0)
+            {
+                normal_sta = TxAbnormal_Status;
+                sta_change2 = normal_sta;
+            }
+            else if(Action_Signal == 0)
+            {
+                if(Status_Un.ActionOpenOrClose == 1)   //开动作
+                {
+                    data_sta = TxOpen_Action_Status;
+                    sta_change2 = data_sta;
+                }
+                else
+                {
+                    data_sta = TxClose_Action_Status;
+                    sta_change2 = data_sta;
+                }
+            }
+            else
+            {
+                data_sta = TxOpen_Status;
+                sta_change2 = data_sta;
+            }
+            if(sta_change != sta_change2)
+            {
+                sta_change = sta_change2;
+                app_tx_en = 1;
+            }
             /*
             if(Status_Un.Flag_LowerLimit == 0)  //下限
             {
@@ -1404,8 +1442,10 @@ void APP429M_Tx_State(void)
         else
             Struct_DATA_Packet_Contro_fno = Tx_Open_Status;
     }*/
-
+    normal_sta = TxNormal_Status;
+    data_sta = TxOpen_Status;
     if(Lower_Limit_Signal == 0) data_sta = TxClose_Status;
+    else if(Abnormal_Signal == 0) normal_sta = TxAbnormal_Status;
     else if(Action_Signal == 0)
     {
         if(Status_Un.ActionOpenOrClose == 1)   //开动作
@@ -1416,8 +1456,6 @@ void APP429M_Tx_State(void)
     else
         data_sta = TxOpen_Status;
 
-    if(Abnormal_Signal == 0) normal_sta = TxAbnormal_Status;
-    else normal_sta = TxNormal_Status;
     app_tx_en = 1;          //开启发送
 }
 
@@ -1457,19 +1495,19 @@ void GetInitial_State(void)
 
     if(Lower_Limit_Signal == 0)
     {
-        sta_change = Tx_Close_Status;
+        sta_change = TxClose_Status;//Tx_Close_Status;
     }
     else if(Abnormal_Signal == 0)
     {
-        sta_change = Tx_Abnormal_Status;
+        sta_change = TxAbnormal_Status;//Tx_Abnormal_Status;
     }
     else if(Action_Signal == 0)
     {
-        sta_change = Tx_Close_Action_Status;
+        sta_change = TxClose_Action_Status;//Tx_Close_Action_Status;
     }
     else
     {
-        sta_change = Tx_Open_Status;
+        sta_change = TxOpen_Status;//Tx_Open_Status;
     }
 }
 

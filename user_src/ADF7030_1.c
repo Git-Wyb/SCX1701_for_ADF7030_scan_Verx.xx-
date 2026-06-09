@@ -1303,7 +1303,7 @@ void Select_TX_frequency(void)
 		 First_TX_Scan=0;
 
 	  }
-	  else if((app_tx_en && TIMER1s<=100)&&(Flag_FREQ_Scan==0)&&((PROFILE_CH_FREQ_32bit_200002EC == 429350000)||(PROFILE_CH_FREQ_32bit_200002EC == 429550000))&&
+	  else if((app_tx_en)&&(Flag_FREQ_Scan==0)&&((PROFILE_CH_FREQ_32bit_200002EC == 429350000)||(PROFILE_CH_FREQ_32bit_200002EC == 429550000))&&
 	  	  (((FLAG_APP_TX_fromOUT==1)&&(TIME_APP_TX_fromOUT==0))||(FLAG_Key_TP3==1)||
 	  	   //((FLAG_APP_TX_fromUART==1)&&(((TIME_APP_TX_fromOUT==0)&&(Radio_Date_Type_bak==2))||((TIMER300ms==0)&&(Radio_Date_Type_bak==1)))&&(Uart_Struct_DATA_Packet_Contro.data[0].ui!=Last_Uart_Struct_DATA_Packet_Contro.data[0].ui))
 	  	   (((TIME_APP_TX_fromOUT==0)&&(Radio_Date_Type_bak==2))||((TIMER300ms==0)&&(Radio_Date_Type_bak==1)))
