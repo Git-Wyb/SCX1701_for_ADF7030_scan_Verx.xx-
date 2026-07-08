@@ -218,6 +218,8 @@ extern u16 BASE_TIME_BEEP_off;
 #define FG_beep_off_Motor   flag1_Un.FlagByte_bit1
 #define recv_429code_flag   flag1_Un.FlagByte_bit2  //1：接收到429MHz的闭操作指令
 #define close_action_beep_flag   flag1_Un.FlagByte_bit3  //1：接收到429MHz的闭操作指令后动作中信号输入，开启蜂鸣器
+#define flag_control_signal      flag1_Un.FlagByte_bit4
+#define flag_state_tx       flag1_Un.FlagByte_bit5
 
 #define Save_Disable_Beep 0xAA
 

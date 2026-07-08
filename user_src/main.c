@@ -129,6 +129,15 @@ void main(void)
             Beep_Action_On();
         }
         if(ID_SCX1801_DATA == 0)    app_tx_en = 0;
+        if(flag_control_signal == 1 && TIMER1s == 0)
+        {
+            if(flag_state_tx == 0) APP429M_Tx_State();
+            else
+            {
+                flag_state_tx = 0;
+                flag_control_signal = 0;
+            }
+        }
     }
 }
 

@@ -701,7 +701,8 @@ void ID_Decode_OUT(void)
                                 else    Allow_BeepOn_Flag = 0;
                                 break;
                         }
-                        APP429M_Tx_State();
+                        flag_control_signal = 1;
+                        //APP429M_Tx_State();
                     }
                 break;
                 case 0x04: //stop
@@ -723,7 +724,8 @@ void ID_Decode_OUT(void)
                     recv_429code_flag = 0;
                     if(Status_Un.PROFILE_RxLowSpeed_TYPE == 1)    //429M
                     {
-                        APP429M_Tx_State();
+                        flag_control_signal = 1;
+                        //APP429M_Tx_State();
                     }
                 break;
                 case 0x08: //open
@@ -742,8 +744,6 @@ void ID_Decode_OUT(void)
                         if(TIMER1s < 950) Receiver_OUT_OPEN = FG_allow_out;
                         Status_Un.ActionOpenOrClose = 1; //开动作
                         operat_action_flag = 1;
-
-                        //APP429M_Tx_State();
                     }
                     else if(Status_Un.PROFILE_RxLowSpeed_TYPE == 1)    //429M
                     {
@@ -764,7 +764,8 @@ void ID_Decode_OUT(void)
                                 operat_action_flag = 1;
                                 break;
                         }
-                        APP429M_Tx_State();
+                        flag_control_signal = 1;
+                        //APP429M_Tx_State();
                     }
                 break;
               case 0x0C: //open+stop
@@ -1022,7 +1023,8 @@ void ID_Decode_OUT(void)
                                 operat_action_flag = 1;
                                 break;
                         }
-                        APP429M_Tx_State();
+                        flag_control_signal = 1;
+                        //APP429M_Tx_State();
                     }
                     else
                     {
@@ -1052,7 +1054,8 @@ void ID_Decode_OUT(void)
                                 recv_429code_flag = 1;
                                 break;
                         }
-                        APP429M_Tx_State();
+                        flag_control_signal = 1;
+                        //APP429M_Tx_State();
                     }
                 } /*
                 if((DATA_Packet_Control==0x7F)&&(Flag_ERROR_Read==0)&&(Flag_shutter_stopping==0))
@@ -1256,7 +1259,7 @@ void Action_Signal_Detection(void)
             Status_Un.Flag_LowerLimit = local_sta.Flag_LowerLimit;
             Status_Un.Flag_AbnormalSignal = local_sta.Flag_AbnormalSignal;
             Status_Un.Flag_ActionSignal =  local_sta.Flag_ActionSignal;
-            //APP429M_Tx_State();
+
             normal_sta = TxNormal_Status;
             data_sta = TxOpen_Status;
             if(Lower_Limit_Signal == 0)
@@ -1291,6 +1294,7 @@ void Action_Signal_Detection(void)
             {
                 sta_change = sta_change2;
                 app_tx_en = 1;
+                if(flag_control_signal) flag_state_tx = 1;
             }
             /*
             if(Status_Un.Flag_LowerLimit == 0)  //下限
@@ -1457,6 +1461,7 @@ void APP429M_Tx_State(void)
         data_sta = TxOpen_Status;
 
     app_tx_en = 1;          //开启发送
+    flag_control_signal = 0;
 }
 
 

@@ -1316,7 +1316,7 @@ void Select_TX_frequency(void)
         Last_Uart_Struct_DATA_Packet_Contro=Struct_DATA_Packet_Contro;//Uart_Struct_DATA_Packet_Contro;
         Last_Uart_Struct_DATA_Packet_Contro.data[0].uc[0] = data_sta;
         Last_Uart_Struct_DATA_Packet_Contro.data[0].uc[1] = normal_sta;
-        Last_Uart_Struct_DATA_Packet_Contro.Fno_Type.UN.type=1;
+        Last_Uart_Struct_DATA_Packet_Contro.Fno_Type.UN.type=2;
         rssi=RAM_RSSI_AVG/128;
         rssi=-rssi;
         if(rssi>=127)rssi=127;
