@@ -262,7 +262,9 @@ void ID_Decode_IDCheck(void)
 				   DATA_Packet_Control=0;
 				   Struct_DATA_Packet_Contro_fno=Struct_DATA_Packet_Contro.Fno_Type.UN.fno;
 				   if(Struct_DATA_Packet_Contro.Fno_Type.UN.type==1) DATA_Packet_Control=Struct_DATA_Packet_Contro.data[0].uc[0];
-					if(((DATA_Packet_Control&0xA0)==0x20)||((DATA_Packet_Control&0xC0)==0x40))TIMER1s=500;
+                   else if(Struct_DATA_Packet_Contro.Fno_Type.UN.type==2) DATA_Packet_Control=Struct_DATA_Packet_Contro.data[0].uc[0];
+
+                   if(((DATA_Packet_Control&0xA0)==0x20)||((DATA_Packet_Control&0xC0)==0x40))TIMER1s=500;
 					else if(((DATA_Packet_Control&0xDF)>0x80)&&((DATA_Packet_Control&0x20)==0x00)){
 						TIMER1s=3000;//(TIMER_Semi_open+1)*1000;
 						if((DATA_Packet_Control&0xDF)<0xC0)TIMER_Semi_open = (DATA_Packet_Control&0x1F) * 10 + 20;//(DATA_Packet_Control&0x1F)+4;
